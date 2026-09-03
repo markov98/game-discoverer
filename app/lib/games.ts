@@ -1,39 +1,48 @@
+import type { Game, GameDetails, GameScreenshot, RawgListResponse } from './types';
+
 const RAWG_API_KEY = process.env.RAWG_API_KEY;
 const RAWG_API_URL = 'https://api.rawg.io/api';
 
-function fetchGames(query: string, page: number = 1, pageSize: number = 10) {
-  const url = `${RAWG_API_URL}/games?key=${RAWG_API_KEY}&search=${encodeURIComponent(query)}&page=${page}&page_size=${pageSize}`;
-  return fetch(url)
-    .then(response => {
-      if (!response.ok) {
-        throw new Error(`Error fetching games: ${response.statusText}`);
-      }
-      return response.json();
-    })
-    .then(data => data.results);
+async function fetchFromRawg<T>(path: string, params: Record<string, string | number | undefined> = {}): Promise<T> {
+  if (!RAWG_API_KEY) {
+    throw new Error('RAWG_API_KEY is not defined');
+  }
+
+  const url = new URL(`${RAWG_API_URL}${path}`);
+  url.searchParams.set('key', RAWG_API_KEY);
+
+  Object.entries(params).forEach(([key, value]) => {
+    if (value !== undefined) {
+      url.searchParams.set(key, String(value));
+    }
+  });
+
+  const response = await fetch(url.toString());
+
+  if (!response.ok) {
+    throw new Error(`Error fetching ${path}: ${response.statusText}`);
+  }
+
+  return response.json() as Promise<T>;
 }
 
-function fetchGameDetails(gameId: number) {
-  const url = `${RAWG_API_URL}/games/${gameId}?key=${RAWG_API_KEY}`;
-  return fetch(url)
-    .then(response => {
-      if (!response.ok) {
-        throw new Error(`Error fetching game details: ${response.statusText}`);
-      }
-      return response.json();
-    });
+async function fetchGames(query: string, page: number = 1, pageSize: number = 10): Promise<Game[]> {
+  const data = await fetchFromRawg<RawgListResponse<Game>>('/games', {
+    search: query,
+    page,
+    page_size: pageSize,
+  });
+
+  return data.results;
 }
 
-function fetchGameScreenshots(gameId: number) {
-  const url = `${RAWG_API_URL}/games/${gameId}/screenshots?key=${RAWG_API_KEY}`;
-  return fetch(url)
-    .then(response => {
-      if (!response.ok) {
-        throw new Error(`Error fetching game screenshots: ${response.statusText}`);
-      }
-      return response.json();
-    })
-    .then(data => data.results);
+async function fetchGameDetails(gameId: number): Promise<GameDetails> {
+  return fetchFromRawg<GameDetails>(`/games/${gameId}`);
+}
+
+async function fetchGameScreenshots(gameId: number): Promise<GameScreenshot[]> {
+  const data = await fetchFromRawg<RawgListResponse<GameScreenshot>>(`/games/${gameId}/screenshots`);
+  return data.results;
 }
 
 export { fetchGames, fetchGameDetails, fetchGameScreenshots };
