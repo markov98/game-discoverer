@@ -13,7 +13,7 @@ export default function Header() {
   return (
     <header className="border-b border-[#2a302b] bg-[#101211]/90 backdrop-blur-sm">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-5 sm:px-10 lg:px-12">
-        <a href="#top" className="flex items-center gap-3 text-lg font-semibold text-[#f8f5ed]">
+        <a href="/" className="flex items-center gap-3 text-lg font-semibold text-[#f8f5ed]">
           <div className="flex h-9 w-9 items-center justify-center border border-[#d7a94b] text-xs font-bold text-[#d7a94b]">
             GD
           </div>

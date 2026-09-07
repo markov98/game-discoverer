@@ -1,42 +1,17 @@
-import Header from "./components/Header";
 import GameBrowser, { Search } from "@/app/components/GameBrowser";
 import { fetchGamesPage } from "./lib/games";
 import { fallbackGames } from "./lib/fallback-games";
+import { formatReleaseDate } from "./lib/formatters";
 
 const pageSize = 12;
 
 async function getDiscoverGames(query: string, genre: string, page: number) {
-  if (!process.env.RAWG_API_KEY) {
-    const matchingGames = fallbackGames.filter((game) => {
-      const matchesSearch = !query || game.name.toLowerCase().includes(query.toLowerCase());
-      const matchesGenre = !genre || game.genres?.some((item) => (
-        typeof item === "string" ? item === genre : item.slug === genre
-      ));
-      return matchesSearch && matchesGenre;
-    });
-
-    const start = (page - 1) * pageSize;
-    return {
-      games: matchingGames.slice(start, start + pageSize),
-      total: matchingGames.length,
-    };
-  }
-
   try {
     const data = await fetchGamesPage(query, page, pageSize, undefined, genre);
     return { games: data.results, total: data.count };
   } catch {
     return { games: fallbackGames, total: fallbackGames.length };
   }
-}
-
-function formatReleaseDate(released?: string | null) {
-  if (!released) return "Coming soon";
-
-  return new Intl.DateTimeFormat("en", {
-    month: "short",
-    year: "numeric",
-  }).format(new Date(released));
 }
 
 export default async function Home({
@@ -53,8 +28,6 @@ export default async function Home({
 
   return (
     <main id="top" className="min-h-screen bg-[#101211] text-[#f4f1e8]">
-      <Header />
-
       <section className="border-b border-[#2a302b] bg-[radial-gradient(circle_at_75%_15%,#394931_0%,transparent_30%),linear-gradient(135deg,#182019_0%,#101211_60%)]">
         <div className="mx-auto grid max-w-7xl gap-12 px-6 py-16 sm:px-10 lg:grid-cols-[1fr_0.9fr] lg:px-12 lg:py-24">
           <div className="flex flex-col justify-center">

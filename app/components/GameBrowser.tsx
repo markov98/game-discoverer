@@ -1,14 +1,6 @@
 import type { Game } from "../lib/types";
 import Link from "next/link";
-
-function formatReleaseDate(released?: string | null) {
-  if (!released) return "Coming soon";
-
-  return new Intl.DateTimeFormat("en", {
-    month: "short",
-    year: "numeric",
-  }).format(new Date(released));
-}
+import { formatReleaseDate } from "../lib/formatters";
 
 export function Search({ genre, query }: { genre: string; query: string }) {
   return (
@@ -17,11 +9,10 @@ export function Search({ genre, query }: { genre: string; query: string }) {
       action="/"
       method="get"
     >
-      <span className="text-xl text-[#d7a94b]" aria-hidden="true">?</span>
       <input
         aria-label="Search games"
         className="min-w-0 flex-1 bg-transparent px-2 text-sm text-[#f8f5ed] outline-none placeholder:text-[#7f897e]"
-        placeholder="Search for a game, genre, or mood"
+        placeholder="Search for a game"
         type="search"
         name="search"
         defaultValue={query}
