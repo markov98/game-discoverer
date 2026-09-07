@@ -1,6 +1,6 @@
 import Header from "./components/Header";
 import GameBrowser, { Search } from "@/app/components/GameBrowser";
-import { fetchGames } from "./lib/games";
+import { fetchGamesPage } from "./lib/games";
 import type { Game } from "./lib/types";
 
 const fallbackGames: Game[] = [
@@ -46,18 +46,26 @@ const fallbackGames: Game[] = [
   },
 ];
 
-async function getDiscoverGames(query: string) {
+const pageSize = 12;
+
+async function getDiscoverGames(query: string, page: number) {
   if (!process.env.RAWG_API_KEY) {
-    return query
+    const matchingGames = query
       ? fallbackGames.filter((game) => game.name.toLowerCase().includes(query.toLowerCase()))
       : fallbackGames;
+
+    const start = (page - 1) * pageSize;
+    return {
+      games: matchingGames.slice(start, start + pageSize),
+      total: matchingGames.length,
+    };
   }
 
   try {
-    const games = await fetchGames(query, 1, 8);
-    return games.length > 0 ? games : query ? [] : fallbackGames;
+    const data = await fetchGamesPage(query, page, pageSize);
+    return { games: data.results, total: data.count };
   } catch {
-    return fallbackGames;
+    return { games: fallbackGames, total: fallbackGames.length };
   }
 }
 
@@ -73,12 +81,14 @@ function formatReleaseDate(released?: string | null) {
 export default async function Home({
   searchParams,
 }: {
-  searchParams: Promise<{ search?: string }>;
+  searchParams: Promise<{ search?: string; page?: string }>;
 }) {
-  const { search = "" } = await searchParams;
-  const games = await getDiscoverGames(search);
+  const { search = "", page: pageParam = "1" } = await searchParams;
+  const requestedPage = Number.parseInt(pageParam, 10);
+  const currentPage = Number.isFinite(requestedPage) && requestedPage > 0 ? requestedPage : 1;
+  const { games, total } = await getDiscoverGames(search, currentPage);
+  const totalPages = Math.max(1, Math.ceil(total / pageSize));
   const featuredGame = games[0];
-  const gridGames = games.slice(1);
 
   return (
     <main id="top" className="min-h-screen bg-[#101211] text-[#f4f1e8]">
@@ -117,7 +127,12 @@ export default async function Home({
         </div>
       </section>
 
-      <GameBrowser games={games} />
+      <GameBrowser
+        currentPage={Math.min(currentPage, totalPages)}
+        games={games}
+        search={search}
+        totalPages={totalPages}
+      />
 
       <footer id="about" className="border-t border-[#2a302b] px-6 py-8 text-center text-xs uppercase tracking-[0.18em] text-[#657061] sm:px-10">
         Curated for curious players - GameDiscoverer

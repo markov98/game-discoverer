@@ -27,13 +27,19 @@ async function fetchFromRawg<T>(path: string, params: Record<string, string | nu
 }
 
 async function fetchGames(query: string, page: number = 1, pageSize: number = 10): Promise<Game[]> {
+  const data = await fetchGamesPage(query, page, pageSize);
+
+  return data.results;
+}
+
+async function fetchGamesPage(query: string, page: number = 1, pageSize: number = 10): Promise<RawgListResponse<Game>> {
   const data = await fetchFromRawg<RawgListResponse<Game>>('/games', {
     search: query,
     page,
     page_size: pageSize,
   });
 
-  return data.results;
+  return data;
 }
 
 async function fetchGameDetails(gameId: number): Promise<GameDetails> {
@@ -45,4 +51,4 @@ async function fetchGameScreenshots(gameId: number): Promise<GameScreenshot[]> {
   return data.results;
 }
 
-export { fetchGames, fetchGameDetails, fetchGameScreenshots };
+export { fetchGames, fetchGamesPage, fetchGameDetails, fetchGameScreenshots };

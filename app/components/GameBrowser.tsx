@@ -32,8 +32,24 @@ export function Search({ query }: { query: string }) {
   );
 }
 
-function GameBrowser({ games }: { games: Game[] }) {
-  const gridGames = games.slice(1);
+function GameBrowser({
+  currentPage,
+  games,
+  search,
+  totalPages,
+}: {
+  currentPage: number;
+  games: Game[];
+  search: string;
+  totalPages: number;
+}) {
+  const gridGames = currentPage === 1 ? games.slice(1) : games;
+  const pageHref = (page: number) => {
+    const params = new URLSearchParams();
+    if (search) params.set("search", search);
+    params.set("page", String(page));
+    return `/?${params.toString()}`;
+  };
 
   return (
     <section id="discover" className="mx-auto max-w-7xl px-6 py-14 sm:px-10 lg:px-12">
@@ -45,7 +61,7 @@ function GameBrowser({ games }: { games: Game[] }) {
         <p className="text-sm text-[#7f897e]">{games.length} {games.length === 1 ? "game" : "games"} found</p>
       </div>
 
-      {games.length > 1 ? (
+      {gridGames.length > 0 ? (
         <div id="trending" className="mt-10 grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
           {gridGames.map((game, index) => (
             <article className="group" key={game.id}>
@@ -63,11 +79,35 @@ function GameBrowser({ games }: { games: Game[] }) {
             </article>
           ))}
         </div>
-      ) : games.length === 1 ? null : (
+      ) : games.length === 1 && currentPage === 1 ? null : (
         <div className="mt-10 border border-dashed border-[#465146] px-6 py-16 text-center">
           <p className="font-serif text-2xl text-[#f8f5ed]">No games match that search.</p>
           <p className="mt-2 text-sm text-[#7f897e]">Try a different title or clear the search field.</p>
         </div>
+      )}
+
+      {totalPages > 1 && (
+        <nav aria-label="Pagination" className="mt-12 flex items-center justify-center gap-2">
+          {currentPage > 1 && (
+            <a
+              className="border border-[#343d35] px-4 py-2 text-xs font-bold uppercase tracking-[0.12em] text-[#c3cabe] transition hover:border-[#d7a94b] hover:text-white"
+              href={pageHref(currentPage - 1)}
+            >
+              Previous
+            </a>
+          )}
+          <span className="px-4 text-sm text-[#7f897e]">
+            Page {currentPage} of {totalPages}
+          </span>
+          {currentPage < totalPages && (
+            <a
+              className="border border-[#d7a94b] px-4 py-2 text-xs font-bold uppercase tracking-[0.12em] text-[#d7a94b] transition hover:bg-[#d7a94b] hover:text-[#151812]"
+              href={pageHref(currentPage + 1)}
+            >
+              Next
+            </a>
+          )}
+        </nav>
       )}
     </section>
   );
