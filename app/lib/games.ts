@@ -12,7 +12,7 @@ async function fetchFromRawg<T>(path: string, params: Record<string, string | nu
   url.searchParams.set('key', RAWG_API_KEY);
 
   Object.entries(params).forEach(([key, value]) => {
-    if (value !== undefined) {
+    if (value !== undefined && value !== '') {
       url.searchParams.set(key, String(value));
     }
   });
@@ -32,11 +32,19 @@ async function fetchGames(query: string, page: number = 1, pageSize: number = 10
   return data.results;
 }
 
-async function fetchGamesPage(query: string, page: number = 1, pageSize: number = 10): Promise<RawgListResponse<Game>> {
+async function fetchGamesPage(
+  query: string,
+  page: number = 1,
+  pageSize: number = 10,
+  ordering?: string,
+  genre?: string,
+): Promise<RawgListResponse<Game>> {
   const data = await fetchFromRawg<RawgListResponse<Game>>('/games', {
     search: query,
     page,
     page_size: pageSize,
+    ordering,
+    genres: genre,
   });
 
   return data;

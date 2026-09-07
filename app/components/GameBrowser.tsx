@@ -9,7 +9,7 @@ function formatReleaseDate(released?: string | null) {
   }).format(new Date(released));
 }
 
-export function Search({ query }: { query: string }) {
+export function Search({ genre, query }: { genre: string; query: string }) {
   return (
     <form
       className="mt-9 flex max-w-xl items-center gap-2 border-b border-[#657061] pb-3 focus-within:border-[#d7a94b]"
@@ -25,6 +25,7 @@ export function Search({ query }: { query: string }) {
         name="search"
         defaultValue={query}
       />
+      {genre && <input type="hidden" name="genre" value={genre} />}
       <button className="text-xs font-bold uppercase tracking-[0.18em] text-[#d7a94b] transition hover:text-[#f3c66a]" type="submit">
         Search
       </button>
@@ -34,19 +35,22 @@ export function Search({ query }: { query: string }) {
 
 function GameBrowser({
   currentPage,
+  genre,
   games,
   search,
   totalPages,
 }: {
   currentPage: number;
+  genre: string;
   games: Game[];
   search: string;
   totalPages: number;
 }) {
-  const gridGames = currentPage === 1 ? games.slice(1) : games;
+  const gridGames = games;
   const pageHref = (page: number) => {
     const params = new URLSearchParams();
     if (search) params.set("search", search);
+    if (genre) params.set("genre", genre);
     params.set("page", String(page));
     return `/?${params.toString()}`;
   };
@@ -58,7 +62,39 @@ function GameBrowser({
           <p className="text-xs font-bold uppercase tracking-[0.25em] text-[#d7a94b]">The library</p>
           <h2 className="mt-3 font-serif text-4xl tracking-[-0.03em] text-[#f8f5ed]">Explore</h2>
         </div>
-        <p className="text-sm text-[#7f897e]">{games.length} {games.length === 1 ? "game" : "games"} found</p>
+      </div>
+
+      <div className="mt-8 flex gap-2 overflow-x-auto pb-2" aria-label="Game genres">
+        {[
+          { label: "All games", value: "" },
+          { label: "Action", value: "action" },
+          { label: "Adventure", value: "adventure" },
+          { label: "Indie", value: "indie" },
+          { label: "RPG", value: "role-playing-games-rpg" },
+          { label: "Strategy", value: "strategy" },
+          { label: "Simulation", value: "simulation" },
+          { label: "Sports", value: "sports" },
+          { label: "Racing", value: "racing" },
+          { label: "Puzzle", value: "puzzle" },
+          { label: "Shooter", value: "shooter" },
+          { label: "Horror", value: "horror" },
+          { label: "Fighting", value: "fighting" },
+        ].map((item) => {
+          const params = new URLSearchParams();
+          if (search) params.set("search", search);
+          if (item.value) params.set("genre", item.value);
+          if (item.value || search) params.set("page", "1");
+
+          return (
+            <a
+              className={`whitespace-nowrap border px-4 py-2 text-xs font-bold uppercase tracking-[0.12em] transition ${genre === item.value ? "border-[#d7a94b] bg-[#d7a94b] text-[#151812]" : "border-[#343d35] text-[#9da79a] hover:border-[#d7a94b] hover:text-[#f8f5ed]"}`}
+              href={params.toString() ? `/?${params.toString()}` : "/"}
+              key={item.value || "all"}
+            >
+              {item.label}
+            </a>
+          );
+        })}
       </div>
 
       {gridGames.length > 0 ? (

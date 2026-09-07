@@ -5,6 +5,9 @@ export type Game = {
   released?: string | null;
   background_image?: string | null;
   rating?: number;
+  ratings_count?: number;
+  reviews_count?: number;
+  genres?: string[];
   metacritic?: number | null;
 };
 

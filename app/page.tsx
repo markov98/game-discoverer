@@ -10,6 +10,8 @@ const fallbackGames: Game[] = [
     name: "Hades",
     released: "2020-09-17",
     rating: 4.4,
+    ratings_count: 4200,
+    genres: ["action", "indie", "role-playing-games-rpg"],
     metacritic: 93,
     background_image:
       "https://images.igdb.com/igdb/image/upload/t_cover_big/co2lbd.jpg",
@@ -20,6 +22,8 @@ const fallbackGames: Game[] = [
     name: "Outer Wilds",
     released: "2019-05-28",
     rating: 4.5,
+    ratings_count: 1800,
+    genres: ["adventure", "indie", "simulation"],
     metacritic: 85,
     background_image:
       "https://images.igdb.com/igdb/image/upload/t_cover_big/co1x7c.jpg",
@@ -30,6 +34,8 @@ const fallbackGames: Game[] = [
     name: "Celeste",
     released: "2018-01-25",
     rating: 4.4,
+    ratings_count: 2200,
+    genres: ["indie", "platformer", "action"],
     metacritic: 92,
     background_image:
       "https://images.igdb.com/igdb/image/upload/t_cover_big/co1tgy.jpg",
@@ -40,6 +46,8 @@ const fallbackGames: Game[] = [
     name: "Disco Elysium",
     released: "2019-10-15",
     rating: 4.6,
+    ratings_count: 3100,
+    genres: ["role-playing-games-rpg", "adventure", "strategy"],
     metacritic: 91,
     background_image:
       "https://images.igdb.com/igdb/image/upload/t_cover_big/co1wyy.jpg",
@@ -48,11 +56,13 @@ const fallbackGames: Game[] = [
 
 const pageSize = 12;
 
-async function getDiscoverGames(query: string, page: number) {
+async function getDiscoverGames(query: string, genre: string, page: number) {
   if (!process.env.RAWG_API_KEY) {
-    const matchingGames = query
-      ? fallbackGames.filter((game) => game.name.toLowerCase().includes(query.toLowerCase()))
-      : fallbackGames;
+    const matchingGames = fallbackGames.filter((game) => {
+      const matchesSearch = !query || game.name.toLowerCase().includes(query.toLowerCase());
+      const matchesGenre = !genre || game.genres?.includes(genre);
+      return matchesSearch && matchesGenre;
+    });
 
     const start = (page - 1) * pageSize;
     return {
@@ -62,7 +72,7 @@ async function getDiscoverGames(query: string, page: number) {
   }
 
   try {
-    const data = await fetchGamesPage(query, page, pageSize);
+    const data = await fetchGamesPage(query, page, pageSize, undefined, genre);
     return { games: data.results, total: data.count };
   } catch {
     return { games: fallbackGames, total: fallbackGames.length };
@@ -81,12 +91,12 @@ function formatReleaseDate(released?: string | null) {
 export default async function Home({
   searchParams,
 }: {
-  searchParams: Promise<{ search?: string; page?: string }>;
+  searchParams: Promise<{ search?: string; genre?: string; page?: string }>;
 }) {
-  const { search = "", page: pageParam = "1" } = await searchParams;
+  const { search = "", genre = "", page: pageParam = "1" } = await searchParams;
   const requestedPage = Number.parseInt(pageParam, 10);
   const currentPage = Number.isFinite(requestedPage) && requestedPage > 0 ? requestedPage : 1;
-  const { games, total } = await getDiscoverGames(search, currentPage);
+  const { games, total } = await getDiscoverGames(search, genre, currentPage);
   const totalPages = Math.max(1, Math.ceil(total / pageSize));
   const featuredGame = games[0];
 
@@ -103,7 +113,7 @@ export default async function Home({
             <h1 className="max-w-2xl font-serif text-5xl leading-[0.95] tracking-[-0.04em] text-[#f8f5ed] sm:text-7xl">
               Follow your curiosity.
             </h1>
-            <Search query={search} />
+            <Search genre={genre} query={search} />
           </div>
 
           {featuredGame && (
@@ -130,6 +140,7 @@ export default async function Home({
       <GameBrowser
         currentPage={Math.min(currentPage, totalPages)}
         games={games}
+        genre={genre}
         search={search}
         totalPages={totalPages}
       />
