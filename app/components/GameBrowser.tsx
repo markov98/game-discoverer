@@ -1,4 +1,5 @@
 import type { Game } from "../lib/types";
+import Link from "next/link";
 
 function formatReleaseDate(released?: string | null) {
   if (!released) return "Coming soon";
@@ -100,19 +101,21 @@ function GameBrowser({
       {gridGames.length > 0 ? (
         <div id="trending" className="mt-10 grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
           {gridGames.map((game, index) => (
-            <article className="group" key={game.id}>
-              <div className="relative aspect-[4/3] overflow-hidden bg-[#252c25]">
-                <img alt={game.name} className="h-full w-full object-cover transition duration-500 group-hover:scale-105" src={game.background_image ?? ""} />
-                <span className="absolute left-4 top-4 bg-[#101211]/80 px-2 py-1 text-[10px] font-bold uppercase tracking-[0.15em] text-[#d7a94b]">0{index + 1}</span>
-              </div>
-              <div className="flex items-start justify-between gap-4 border-b border-[#2d342e] py-4">
-                <div>
-                  <h3 className="font-serif text-2xl text-[#f8f5ed]">{game.name}</h3>
-                  <p className="mt-1 text-sm text-[#7f897e]">{formatReleaseDate(game.released)}</p>
+            <Link className="group" href={`/games/${game.id}`} key={game.id}>
+              <article>
+                <div className="relative aspect-[4/3] overflow-hidden bg-[#252c25]">
+                  <img alt={game.name} className="h-full w-full object-cover transition duration-500 group-hover:scale-105" src={game.background_image ?? ""} />
+                  <span className="absolute left-4 top-4 bg-[#101211]/80 px-2 py-1 text-[10px] font-bold uppercase tracking-[0.15em] text-[#d7a94b]">0{index + 1}</span>
                 </div>
-                <span className="pt-1 text-sm text-[#d7a94b]">* {game.rating?.toFixed(1) ?? "-"}</span>
-              </div>
-            </article>
+                <div className="flex items-start justify-between gap-4 border-b border-[#2d342e] py-4">
+                  <div>
+                    <h3 className="font-serif text-2xl text-[#f8f5ed]">{game.name}</h3>
+                    <p className="mt-1 text-sm text-[#7f897e]">{formatReleaseDate(game.released)}</p>
+                  </div>
+                  <span className="pt-1 text-sm text-[#d7a94b]">* {game.rating?.toFixed(1) ?? "-"}</span>
+                </div>
+              </article>
+            </Link>
           ))}
         </div>
       ) : games.length === 1 && currentPage === 1 ? null : (

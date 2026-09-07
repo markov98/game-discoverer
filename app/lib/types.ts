@@ -7,7 +7,7 @@ export type Game = {
   rating?: number;
   ratings_count?: number;
   reviews_count?: number;
-  genres?: string[];
+  genres?: (string | { name: string; slug: string })[];
   metacritic?: number | null;
 };
 
