@@ -1,4 +1,4 @@
-import type { Game, GameDetails, GameScreenshot, RawgListResponse } from './types';
+import type { Game, GameDetails, GameScreenshot, GameStore, RawgListResponse } from './types';
 
 const RAWG_API_KEY = process.env.RAWG_API_KEY;
 const RAWG_API_URL = 'https://api.rawg.io/api';
@@ -59,4 +59,51 @@ async function fetchGameScreenshots(gameId: number): Promise<GameScreenshot[]> {
   return data.results;
 }
 
-export { fetchGames, fetchGamesPage, fetchGameDetails, fetchGameScreenshots };
+async function fetchStoreDetails(storeId: number): Promise<{ id: number; name: string; slug: string; domain?: string | null }> {
+  return fetchFromRawg<{ id: number; name: string; slug: string; domain?: string | null }>(`/stores/${storeId}`);
+}
+
+async function fetchGameStores(gameId: number): Promise<GameStore[]> {
+  const data = await fetchFromRawg<RawgListResponse<GameStore>>(`/games/${gameId}/stores`);
+  const rawStores = data.results ?? [];
+
+  if (rawStores.length === 0) {
+    return rawStores;
+  }
+
+  const storeIds = [...new Set(
+    rawStores
+      .map((store) => store.store_id ?? store.store?.id)
+      .filter((id): id is number => typeof id === "number" && Number.isFinite(id)),
+  )];
+
+  if (storeIds.length === 0) {
+    return rawStores;
+  }
+
+  const storeDetails = await Promise.all(
+    storeIds.map(async (storeId) => {
+      try {
+        return await fetchStoreDetails(storeId);
+      } catch {
+        return null;
+      }
+    }),
+  );
+
+  const storeLookup = new Map(
+    storeDetails.filter((store): store is { id: number; name: string; slug: string; domain?: string | null } => Boolean(store)).map((store) => [store.id, store]),
+  );
+
+  return rawStores.map((store) => {
+    const storeId = store.store_id ?? store.store?.id;
+    const detail = storeId ? storeLookup.get(storeId) ?? null : null;
+
+    return {
+      ...store,
+      store: detail ?? store.store ?? null,
+    };
+  });
+}
+
+export { fetchGames, fetchGamesPage, fetchGameDetails, fetchGameScreenshots, fetchGameStores };

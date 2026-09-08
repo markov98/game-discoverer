@@ -11,6 +11,19 @@ export type Game = {
   metacritic?: number | null;
 };
 
+export type GameStore = {
+  id: number;
+  game_id?: number;
+  store_id?: number | null;
+  url?: string | null;
+  store?: {
+    id: number;
+    name: string;
+    slug: string;
+    domain?: string | null;
+  } | null;
+};
+
 export type GameDetails = Game & {
   description?: string;
   website?: string | null;

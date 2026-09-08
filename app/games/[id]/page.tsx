@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { fetchGameDetails, fetchGameScreenshots } from "@/app/lib/games";
-import { fallbackGames } from "@/app/lib/fallback-games";
+import { fetchGameDetails, fetchGameScreenshots, fetchGameStores } from "@/app/lib/games";
 import type { GameDetails, GameScreenshot } from "@/app/lib/types";
 
 function formatReleaseDate(released?: string | null) {
@@ -23,17 +22,40 @@ function formatGenre(genre: string | { name: string; slug: string }) {
   return label.replaceAll("-", " ");
 }
 
-async function getGame(id: number): Promise<{ game: GameDetails; screenshots: GameScreenshot[] }> {
+function formatStoreName(name?: string) {
+  if (!name) return "Store";
+
+  return name
+    .replaceAll("-", " ")
+    .replace(/\b\w/g, (letter) => letter.toUpperCase());
+}
+
+async function getGame(id: number): Promise<{ game?: GameDetails; screenshots: GameScreenshot[]; storeLinks: Array<{ id: number; url: string; label: string }>; error?: string }> {
   try {
-    const [game, screenshots] = await Promise.all([
+    const [game, screenshots, stores] = await Promise.all([
       fetchGameDetails(id),
       fetchGameScreenshots(id),
+      fetchGameStores(id),
     ]);
-    return { game, screenshots };
+
+    return {
+      game,
+      screenshots,
+      storeLinks: (stores ?? [])
+        .filter((store) => Boolean(store?.url))
+        .map((store) => ({
+          id: store.id,
+          url: store.url ?? "",
+          label: formatStoreName(store.store?.name ?? store.store?.slug),
+        })),
+    };
   } catch {
-    const fallbackGame = fallbackGames.find((game) => game.id === id);
-    if (!fallbackGame) notFound();
-    return { game: fallbackGame, screenshots: [] };
+    return {
+      game: undefined,
+      screenshots: [],
+      storeLinks: [],
+      error: "API Problem, please try again later.",
+    };
   }
 }
 
@@ -45,7 +67,23 @@ export default async function GameDetailsPage({
   const id = Number.parseInt((await params).id, 10);
   if (!Number.isInteger(id)) notFound();
 
-  const { game, screenshots } = await getGame(id);
+  const { game, screenshots, storeLinks, error } = await getGame(id);
+
+  if (!game) {
+    return (
+      <main className="min-h-screen bg-[#101211] text-[#f4f1e8]">
+        <div className="mx-auto max-w-4xl px-6 py-20 sm:px-10 lg:px-12">
+          <Link className="text-xs font-bold uppercase tracking-[0.18em] text-[#d7a94b] hover:text-[#f3c66a]" href="/">
+            Back to discover
+          </Link>
+          <div className="mt-10 border border-dashed border-[#465146] bg-[#171b18] px-6 py-16 text-center">
+            <p className="font-serif text-3xl text-[#f8f5ed]">{error ?? "API Problem, please try again later."}</p>
+          </div>
+        </div>
+      </main>
+    );
+  }
+
   const description = plainText(game.description) ?? "Details for this game are not available yet.";
 
   return (
@@ -77,10 +115,25 @@ export default async function GameDetailsPage({
                 ))}
               </div>
             )}
-            {game.website && (
-              <a className="mt-8 inline-block border border-[#d7a94b] px-4 py-3 text-xs font-bold uppercase tracking-[0.14em] text-[#d7a94b] hover:bg-[#d7a94b] hover:text-[#151812]" href={game.website} target="_blank" rel="noreferrer">
-                Official website
-              </a>
+            {(game.website || storeLinks.length > 0) && (
+              <div className="mt-8 flex flex-wrap gap-3">
+                {game.website && (
+                  <a className="inline-block border border-[#d7a94b] px-4 py-3 text-xs font-bold uppercase tracking-[0.14em] text-[#d7a94b] hover:bg-[#d7a94b] hover:text-[#151812]" href={game.website} target="_blank" rel="noreferrer">
+                    Official website
+                  </a>
+                )}
+                {storeLinks.map((store) => (
+                  <a
+                    className="inline-block border border-[#39433a] px-4 py-3 text-xs font-bold uppercase tracking-[0.14em] text-[#c3cabe] transition hover:border-[#d7a94b] hover:text-[#f8f5ed]"
+                    href={store.url}
+                    key={store.id}
+                    rel="noreferrer"
+                    target="_blank"
+                  >
+                    {store.label}
+                  </a>
+                ))}
+              </div>
             )}
           </div>
         </section>

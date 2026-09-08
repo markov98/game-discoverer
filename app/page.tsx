@@ -1,6 +1,5 @@
 import GameBrowser, { Search } from "@/app/components/GameBrowser";
 import { fetchGamesPage } from "./lib/games";
-import { fallbackGames } from "./lib/fallback-games";
 import { formatReleaseDate } from "./lib/formatters";
 
 const pageSize = 12;
@@ -8,9 +7,9 @@ const pageSize = 12;
 async function getDiscoverGames(query: string, genre: string, page: number) {
   try {
     const data = await fetchGamesPage(query, page, pageSize, undefined, genre);
-    return { games: data.results, total: data.count };
+    return { games: data.results, total: data.count, error: null };
   } catch {
-    return { games: fallbackGames, total: fallbackGames.length };
+    return { games: [], total: 0, error: "API Problem, please try again later." };
   }
 }
 
@@ -22,7 +21,7 @@ export default async function Home({
   const { search = "", genre = "", page: pageParam = "1" } = await searchParams;
   const requestedPage = Number.parseInt(pageParam, 10);
   const currentPage = Number.isFinite(requestedPage) && requestedPage > 0 ? requestedPage : 1;
-  const { games, total } = await getDiscoverGames(search, genre, currentPage);
+  const { games, total, error } = await getDiscoverGames(search, genre, currentPage);
   const totalPages = Math.max(1, Math.ceil(total / pageSize));
   const featuredGame = games[0];
 
@@ -63,6 +62,7 @@ export default async function Home({
 
       <GameBrowser
         currentPage={Math.min(currentPage, totalPages)}
+        error={error}
         games={games}
         genre={genre}
         search={search}

@@ -27,12 +27,14 @@ export function Search({ genre, query }: { genre: string; query: string }) {
 
 function GameBrowser({
   currentPage,
+  error,
   genre,
   games,
   search,
   totalPages,
 }: {
   currentPage: number;
+  error?: string | null;
   genre: string;
   games: Game[];
   search: string;
@@ -89,7 +91,11 @@ function GameBrowser({
         })}
       </div>
 
-      {gridGames.length > 0 ? (
+      {error ? (
+        <div className="mt-10 border border-dashed border-[#465146] bg-[#171b18] px-6 py-16 text-center">
+          <p className="font-serif text-2xl text-[#f8f5ed]">{error}</p>
+        </div>
+      ) : gridGames.length > 0 ? (
         <div id="trending" className="mt-10 grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
           {gridGames.map((game, index) => (
             <Link className="group" href={`/games/${game.id}`} key={game.id}>
