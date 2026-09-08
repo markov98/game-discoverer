@@ -1,8 +1,13 @@
 import GameBrowser, { Search } from "@/app/components/GameBrowser";
+import type { Metadata } from "next";
 import { fetchGamesPage } from "./lib/games";
 import { formatReleaseDate } from "./lib/formatters";
 
 const pageSize = 12;
+
+export const metadata: Metadata = {
+  title: "Discover games | GameDiscoverer",
+};
 
 async function getDiscoverGames(query: string, genre: string, page: number) {
   try {

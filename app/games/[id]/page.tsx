@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { fetchGameDetails, fetchGameScreenshots, fetchGameStores } from "@/app/lib/games";
 import type { GameDetails, GameScreenshot } from "@/app/lib/types";
@@ -56,6 +57,25 @@ async function getGame(id: number): Promise<{ game?: GameDetails; screenshots: G
       storeLinks: [],
       error: "API Problem, please try again later.",
     };
+  }
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+  const id = Number.parseInt((await params).id, 10);
+
+  if (!Number.isInteger(id)) {
+    return { title: "Game details | GameDiscoverer" };
+  }
+
+  try {
+    const game = await fetchGameDetails(id);
+    return { title: `${game.name} | GameDiscoverer` };
+  } catch {
+    return { title: "Game details | GameDiscoverer" };
   }
 }
 
