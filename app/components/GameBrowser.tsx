@@ -2,7 +2,7 @@ import type { Game } from "../lib/types";
 import Link from "next/link";
 import { formatReleaseDate } from "../lib/formatters";
 
-export function Search({ genre, query }: { genre: string; query: string }) {
+export function Search({ genre, platform, query }: { genre: string; platform: string; query: string }) {
   return (
     <form
       className="mt-9 flex max-w-xl items-center gap-2 border-b border-[#657061] pb-3 focus-within:border-[#d7a94b]"
@@ -18,6 +18,7 @@ export function Search({ genre, query }: { genre: string; query: string }) {
         defaultValue={query}
       />
       {genre && <input type="hidden" name="genre" value={genre} />}
+      {platform && <input type="hidden" name="platform" value={platform} />}
       <button className="text-xs font-bold uppercase tracking-[0.18em] text-[#d7a94b] transition hover:text-[#f3c66a]" type="submit">
         Search
       </button>
@@ -30,6 +31,7 @@ function GameBrowser({
   error,
   genre,
   games,
+  platform,
   search,
   totalPages,
 }: {
@@ -37,6 +39,7 @@ function GameBrowser({
   error?: string | null;
   genre: string;
   games: Game[];
+  platform: string;
   search: string;
   totalPages: number;
 }) {
@@ -45,6 +48,7 @@ function GameBrowser({
     const params = new URLSearchParams();
     if (search) params.set("search", search);
     if (genre) params.set("genre", genre);
+    if (platform) params.set("platform", platform);
     params.set("page", String(page));
     return `/?${params.toString()}`;
   };
@@ -82,6 +86,37 @@ function GameBrowser({
           return (
             <a
               className={`whitespace-nowrap border px-4 py-2 text-xs font-bold uppercase tracking-[0.12em] transition ${genre === item.value ? "border-[#d7a94b] bg-[#d7a94b] text-[#151812]" : "border-[#343d35] text-[#9da79a] hover:border-[#d7a94b] hover:text-[#f8f5ed]"}`}
+              href={params.toString() ? `/?${params.toString()}` : "/"}
+              key={item.value || "all"}
+            >
+              {item.label}
+            </a>
+          );
+        })}
+      </div>
+
+      <div className="mt-3 flex flex-wrap gap-2" aria-label="Game platforms">
+        <span className="mr-2 self-center text-xs font-bold uppercase tracking-[0.12em] text-[#657061]">Platform</span>
+        {[
+          { label: "All", value: "" },
+          { label: "PC", value: "4" },
+          { label: "PlayStation 5", value: "187" },
+          { label: "Xbox Series", value: "186" },
+          { label: "Switch", value: "7" },
+          { label: "PlayStation 4", value: "18" },
+          { label: "Xbox One", value: "1" },
+          { label: "iOS", value: "3" },
+          { label: "Android", value: "21" },
+        ].map((item) => {
+          const params = new URLSearchParams();
+          if (search) params.set("search", search);
+          if (genre) params.set("genre", genre);
+          if (item.value) params.set("platform", item.value);
+          if (item.value || genre || search) params.set("page", "1");
+
+          return (
+            <a
+              className={`whitespace-nowrap border px-3 py-2 text-[11px] font-bold uppercase tracking-[0.1em] transition ${platform === item.value ? "border-[#d7a94b] bg-[#d7a94b] text-[#151812]" : "border-[#343d35] text-[#9da79a] hover:border-[#d7a94b] hover:text-[#f8f5ed]"}`}
               href={params.toString() ? `/?${params.toString()}` : "/"}
               key={item.value || "all"}
             >

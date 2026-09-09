@@ -9,9 +9,9 @@ export const metadata: Metadata = {
   title: "Discover games | GameDiscoverer",
 };
 
-async function getDiscoverGames(query: string, genre: string, page: number) {
+async function getDiscoverGames(query: string, genre: string, platform: string, page: number) {
   try {
-    const data = await fetchGamesPage(query, page, pageSize, undefined, genre);
+    const data = await fetchGamesPage(query, page, pageSize, undefined, genre, platform);
     return { games: data.results, total: data.count, error: null };
   } catch {
     return { games: [], total: 0, error: "API Problem, please try again later." };
@@ -21,12 +21,12 @@ async function getDiscoverGames(query: string, genre: string, page: number) {
 export default async function Home({
   searchParams,
 }: {
-  searchParams: Promise<{ search?: string; genre?: string; page?: string }>;
+  searchParams: Promise<{ search?: string; genre?: string; platform?: string; page?: string }>;
 }) {
-  const { search = "", genre = "", page: pageParam = "1" } = await searchParams;
+  const { search = "", genre = "", platform = "", page: pageParam = "1" } = await searchParams;
   const requestedPage = Number.parseInt(pageParam, 10);
   const currentPage = Number.isFinite(requestedPage) && requestedPage > 0 ? requestedPage : 1;
-  const { games, total, error } = await getDiscoverGames(search, genre, currentPage);
+  const { games, total, error } = await getDiscoverGames(search, genre, platform, currentPage);
   const totalPages = Math.max(1, Math.ceil(total / pageSize));
   const featuredGame = games[0];
 
@@ -41,7 +41,7 @@ export default async function Home({
             <h1 className="max-w-2xl font-serif text-5xl leading-[0.95] tracking-[-0.04em] text-[#f8f5ed] sm:text-7xl">
               Follow your curiosity.
             </h1>
-            <Search genre={genre} query={search} />
+            <Search genre={genre} platform={platform} query={search} />
           </div>
 
           {featuredGame && (
@@ -71,6 +71,7 @@ export default async function Home({
         games={games}
         genre={genre}
         search={search}
+        platform={platform}
         totalPages={totalPages}
       />
 

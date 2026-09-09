@@ -38,6 +38,7 @@ async function fetchGamesPage(
   pageSize: number = 10,
   ordering?: string,
   genre?: string,
+  platform?: string,
 ): Promise<RawgListResponse<Game>> {
   const data = await fetchFromRawg<RawgListResponse<Game>>('/games', {
     search: query,
@@ -45,6 +46,7 @@ async function fetchGamesPage(
     page_size: pageSize,
     ordering,
     genres: genre,
+    platforms: platform,
   });
 
   return data;
