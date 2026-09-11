@@ -1,5 +1,6 @@
 import GameBrowser, { Search } from "@/app/components/GameBrowser";
 import type { Metadata } from "next";
+import Link from "next/link";
 import { fetchGamesPage } from "./lib/games";
 import { formatReleaseDate } from "./lib/formatters";
 
@@ -45,22 +46,24 @@ export default async function Home({
           </div>
 
           {featuredGame && (
-            <article className="group relative min-h-[360px] overflow-hidden border border-[#66705f] bg-[#252c25] shadow-2xl shadow-black/20 lg:min-h-[470px]">
-              <img
-                alt=""
-                className="absolute inset-0 h-full w-full object-cover opacity-75 transition duration-700 group-hover:scale-105"
-                src={featuredGame.background_image ?? ""}
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#101211] via-[#101211]/30 to-transparent" />
-              <div className="absolute inset-x-0 bottom-0 p-6 sm:p-8">
-                <p className="text-xs font-bold uppercase tracking-[0.22em] text-[#d7a94b]">Featured pick</p>
-                <h2 className="mt-2 font-serif text-4xl text-white sm:text-5xl">{featuredGame.name}</h2>
-                <div className="mt-4 flex items-center gap-4 text-sm text-[#d4d8ce]">
-                  <span>* {featuredGame.rating?.toFixed(1)}</span>
-                  <span className="text-[#7f897e]">{formatReleaseDate(featuredGame.released)}</span>
+            <Link href={`/games/${featuredGame.id}`} className="group">
+              <article className="relative min-h-[360px] overflow-hidden border border-[#66705f] bg-[#252c25] shadow-2xl shadow-black/20 lg:min-h-[470px]">
+                <img
+                  alt=""
+                  className="absolute inset-0 h-full w-full object-cover opacity-75 transition duration-700 group-hover:scale-105"
+                  src={featuredGame.background_image ?? ""}
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#101211] via-[#101211]/30 to-transparent" />
+                <div className="absolute inset-x-0 bottom-0 p-6 sm:p-8">
+                  <p className="text-xs font-bold uppercase tracking-[0.22em] text-[#d7a94b]">Featured pick</p>
+                  <h2 className="mt-2 font-serif text-4xl text-white sm:text-5xl">{featuredGame.name}</h2>
+                  <div className="mt-4 flex items-center gap-4 text-sm text-[#d4d8ce]">
+                    <span>* {featuredGame.rating?.toFixed(1)}</span>
+                    <span className="text-[#7f897e]">{formatReleaseDate(featuredGame.released)}</span>
+                  </div>
                 </div>
-              </div>
-            </article>
+              </article>
+            </Link>
           )}
         </div>
       </section>
