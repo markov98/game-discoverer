@@ -91,7 +91,7 @@ export default async function GameDetailsPage({
 
   if (!game) {
     return (
-      <main className="min-h-screen bg-[#101211] text-[#f4f1e8]">
+      <div>
         <div className="mx-auto max-w-4xl px-6 py-20 sm:px-10 lg:px-12">
           <Link className="text-xs font-bold uppercase tracking-[0.18em] text-[#d7a94b] hover:text-[#f3c66a]" href="/">
             Back to discover
@@ -100,14 +100,14 @@ export default async function GameDetailsPage({
             <p className="font-serif text-3xl text-[#f8f5ed]">{error ?? "API Problem, please try again later."}</p>
           </div>
         </div>
-      </main>
+      </div>
     );
   }
 
   const description = plainText(game.description) ?? "Details for this game are not available yet.";
 
   return (
-    <main className="min-h-screen bg-[#101211] text-[#f4f1e8]">
+    <div>
       <div className="mx-auto max-w-7xl px-6 py-8 sm:px-10 lg:px-12">
         <Link className="text-xs font-bold uppercase tracking-[0.18em] text-[#d7a94b] hover:text-[#f3c66a]" href="/">
           Back to discover
@@ -169,6 +169,6 @@ export default async function GameDetailsPage({
           </section>
         )}
       </div>
-    </main>
+    </div>
   );
 }

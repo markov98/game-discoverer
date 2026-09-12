@@ -9,11 +9,13 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    
     <html lang="en">
       <body>
         <Header />
-        {children}</body>
+        <main id="top" className="min-h-screen bg-[#101211] text-[#f4f1e8]">
+          {children}
+        </main>
+      </body>
     </html>
   );
 }

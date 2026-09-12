@@ -32,7 +32,7 @@ export default async function Home({
   const featuredGame = games[0];
 
   return (
-    <main id="top" className="min-h-screen bg-[#101211] text-[#f4f1e8]">
+    <>
       <section className="border-b border-[#2a302b] bg-[radial-gradient(circle_at_75%_15%,#394931_0%,transparent_30%),linear-gradient(135deg,#182019_0%,#101211_60%)]">
         <div className="mx-auto grid max-w-7xl gap-12 px-6 py-16 sm:px-10 lg:grid-cols-[1fr_0.9fr] lg:px-12 lg:py-24">
           <div className="flex flex-col justify-center">
@@ -81,6 +81,6 @@ export default async function Home({
       <footer id="about" className="border-t border-[#2a302b] px-6 py-8 text-center text-xs uppercase tracking-[0.18em] text-[#657061] sm:px-10">
         Curated for curious players - GameDiscoverer
       </footer>
-    </main>
+    </>
   );
 }
