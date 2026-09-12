@@ -84,13 +84,13 @@ function GameBrowser({
           if (item.value || search) params.set("page", "1");
 
           return (
-            <a
+            <Link
               className={`whitespace-nowrap border px-4 py-2 text-xs font-bold uppercase tracking-[0.12em] transition ${genre === item.value ? "border-[#d7a94b] bg-[#d7a94b] text-[#151812]" : "border-[#343d35] text-[#9da79a] hover:border-[#d7a94b] hover:text-[#f8f5ed]"}`}
               href={params.toString() ? `/?${params.toString()}` : "/"}
               key={item.value || "all"}
             >
               {item.label}
-            </a>
+            </Link>
           );
         })}
       </div>
@@ -115,13 +115,13 @@ function GameBrowser({
           if (item.value || genre || search) params.set("page", "1");
 
           return (
-            <a
+            <Link
               className={`whitespace-nowrap border px-3 py-2 text-[11px] font-bold uppercase tracking-[0.1em] transition ${platform === item.value ? "border-[#d7a94b] bg-[#d7a94b] text-[#151812]" : "border-[#343d35] text-[#9da79a] hover:border-[#d7a94b] hover:text-[#f8f5ed]"}`}
               href={params.toString() ? `/?${params.toString()}` : "/"}
               key={item.value || "all"}
             >
               {item.label}
-            </a>
+            </Link>
           );
         })}
       </div>
@@ -150,7 +150,7 @@ function GameBrowser({
             </Link>
           ))}
         </div>
-      ) : games.length === 1 && currentPage === 1 ? null : (
+      ) : (
         <div className="mt-10 border border-dashed border-[#465146] px-6 py-16 text-center">
           <p className="font-serif text-2xl text-[#f8f5ed]">No games match that search.</p>
           <p className="mt-2 text-sm text-[#7f897e]">Try a different title or clear the search field.</p>
@@ -160,23 +160,23 @@ function GameBrowser({
       {totalPages > 1 && (
         <nav aria-label="Pagination" className="mt-12 flex items-center justify-center gap-2">
           {currentPage > 1 && (
-            <a
+            <Link
               className="border border-[#343d35] px-4 py-2 text-xs font-bold uppercase tracking-[0.12em] text-[#c3cabe] transition hover:border-[#d7a94b] hover:text-white"
               href={pageHref(currentPage - 1)}
             >
               Previous
-            </a>
+            </Link>
           )}
           <span className="px-4 text-sm text-[#7f897e]">
             Page {currentPage} of {totalPages}
           </span>
           {currentPage < totalPages && (
-            <a
+            <Link
               className="border border-[#d7a94b] px-4 py-2 text-xs font-bold uppercase tracking-[0.12em] text-[#d7a94b] transition hover:bg-[#d7a94b] hover:text-[#151812]"
               href={pageHref(currentPage + 1)}
             >
               Next
-            </a>
+            </Link>
           )}
         </nav>
       )}
