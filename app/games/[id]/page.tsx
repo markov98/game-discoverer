@@ -123,12 +123,30 @@ export default async function GameDetailsPage({
               </div>
             )}
             {game.tags && game.tags.length > 0 && (
-              <div className="mt-8 flex flex-wrap gap-2">
-                {game.tags.map((tag) => (
-                  <span className="border border-[#39433a] px-3 py-2 text-xs uppercase tracking-[0.12em] text-[#9da79a]" key={tag.slug}>
-                    {tag.name}
-                  </span>
-                ))}
+              <div className="mt-8">
+                <div className="flex flex-wrap gap-2">
+                  {game.tags.slice(0, 3).map((tag) => (
+                    <span className="border border-[#39433a] px-3 py-2 text-[10px] uppercase tracking-[0.12em] text-[#9da79a]" key={tag.slug}>
+                      {tag.name}
+                    </span>
+                  ))}
+                </div>
+
+                {game.tags.length > 3 && (
+                  <details className="group mt-3">
+                    <summary className="flex w-fit cursor-pointer list-none items-center gap-2 whitespace-nowrap px-3 py-2 text-[10px] font-bold uppercase tracking-[0.14em] text-[#d7a94b]">
+                      <span>+{game.tags.length - 3} more</span>
+                      <span className="text-[#9da79a] transition group-open:rotate-180">▾</span>
+                    </summary>
+                    <div className="mt-3 flex flex-wrap gap-2 border-t border-[#39433a] pt-3">
+                      {game.tags.slice(3).map((tag) => (
+                        <span className="border border-[#39433a] px-3 py-2 text-[10px] uppercase tracking-[0.12em] text-[#9da79a]" key={tag.slug}>
+                          {tag.name}
+                        </span>
+                      ))}
+                    </div>
+                  </details>
+                )}
               </div>
             )}
             {(game.website || storeLinks.length > 0) && (
