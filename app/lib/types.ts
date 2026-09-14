@@ -7,7 +7,8 @@ export type Game = {
   rating?: number;
   ratings_count?: number;
   reviews_count?: number;
-  genres?: (string | { name: string; slug: string })[];
+  genres?: Array<{ name: string; slug: string }>;
+  tags?: Array<{ name: string; slug: string }>;
   metacritic?: number | null;
 };
 

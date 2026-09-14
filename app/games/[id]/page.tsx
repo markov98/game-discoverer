@@ -14,21 +14,8 @@ function formatReleaseDate(released?: string | null) {
   }).format(new Date(released));
 }
 
-function plainText(description?: string) {
+function stripHtmlAndNormalize(description?: string) {
   return description?.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
-}
-
-function formatGenre(genre: string | { name: string; slug: string }) {
-  const label = typeof genre === "string" ? genre : genre.name;
-  return label.replaceAll("-", " ");
-}
-
-function formatStoreName(name?: string) {
-  if (!name) return "Store";
-
-  return name
-    .replaceAll("-", " ")
-    .replace(/\b\w/g, (letter) => letter.toUpperCase());
 }
 
 async function getGame(id: number): Promise<{ game?: GameDetails; screenshots: GameScreenshot[]; storeLinks: Array<{ id: number; url: string; label: string }>; error?: string }> {
@@ -47,7 +34,7 @@ async function getGame(id: number): Promise<{ game?: GameDetails; screenshots: G
         .map((store) => ({
           id: store.id,
           url: store.url ?? "",
-          label: formatStoreName(store.store?.name ?? store.store?.slug),
+          label: store.store?.name ?? store.store?.slug ?? "Store",
         })),
     };
   } catch {
@@ -104,7 +91,7 @@ export default async function GameDetailsPage({
     );
   }
 
-  const description = plainText(game.description) ?? "Details for this game are not available yet.";
+  const description = stripHtmlAndNormalize(game.description) ?? "Details for this game are not available yet.";
 
   return (
     <div>
@@ -126,11 +113,20 @@ export default async function GameDetailsPage({
               {game.metacritic && <span>{game.metacritic} Metacritic</span>}
             </div>
             <p className="mt-8 max-w-2xl text-base leading-8 text-[#b8c0b4]">{description}</p>
-            {game.genres && (
+            {game.genres && game.genres.length > 0 && (
               <div className="mt-8 flex flex-wrap gap-2">
                 {game.genres.map((genre) => (
-                  <span className="border border-[#39433a] px-3 py-2 text-xs uppercase tracking-[0.12em] text-[#9da79a]" key={typeof genre === "string" ? genre : genre.slug}>
-                    {formatGenre(genre)}
+                  <span className="border border-[#39433a] px-3 py-2 text-xs uppercase tracking-[0.12em] text-[#9da79a]" key={genre.slug}>
+                    {genre.name}
+                  </span>
+                ))}
+              </div>
+            )}
+            {game.tags && game.tags.length > 0 && (
+              <div className="mt-8 flex flex-wrap gap-2">
+                {game.tags.map((tag) => (
+                  <span className="border border-[#39433a] px-3 py-2 text-xs uppercase tracking-[0.12em] text-[#9da79a]" key={tag.slug}>
+                    {tag.name}
                   </span>
                 ))}
               </div>
