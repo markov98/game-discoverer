@@ -2,6 +2,8 @@
 
 GameDiscoverer is a fast, focused game discovery app powered by the [RAWG Video Games Database API](https://rawg.io/apidocs). Browse a library of games, search by title, filter by genre or platform, and open a details page with ratings, release information, screenshots, and store links.
 
+Deployed here: game-discoverer.vercel.app
+
 ## Features
 
 - Search games by title
@@ -107,18 +109,3 @@ Potential future improvements:
 - [ ] Add image optimization and caching for API media
 
 
-## Getting Started
-
-To run the development server:
-
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
