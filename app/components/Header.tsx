@@ -3,12 +3,6 @@ type NavItem = {
   href: string;
 };
 
-const navItems: NavItem[] = [
-  { label: "Discover", href: "#discover" },
-  { label: "Wishlist", href: "#wishlist" },
-  { label: "About", href: "#about" },
-];
-
 export default function Header() {
   return (
     <header className="border-b border-[#2a302b] bg-[#101211]/90 backdrop-blur-sm">
@@ -19,18 +13,6 @@ export default function Header() {
           </div>
           <span>GameDiscoverer</span>
         </a>
-
-        <nav aria-label="Main navigation" className="hidden items-center gap-8 md:flex">
-          {navItems.map((item) => (
-            <a
-              key={item.label}
-              href={item.href}
-              className="text-sm text-[#9da79a] transition hover:text-[#f8f5ed]"
-            >
-              {item.label}
-            </a>
-          ))}
-        </nav>
 
       </div>
     </header>

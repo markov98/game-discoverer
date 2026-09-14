@@ -1,8 +1,115 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# GameDiscoverer
+
+GameDiscoverer is a fast, focused game discovery app powered by the [RAWG Video Games Database API](https://rawg.io/apidocs). Browse a library of games, search by title, filter by genre or platform, and open a details page with ratings, release information, screenshots, and store links.
+
+## Features
+
+- Search games by title
+- Filter results by genre and platform
+- Paginate through the game library
+- View game ratings, release dates, genres, and descriptions
+- Browse screenshots and links to official websites and stores
+- Loading states for the home page and game detail pages
+- Responsive layout for desktop and mobile screens
+
+## Tech Stack
+
+- [Next.js 16](https://nextjs.org/) with the App Router
+- [React 19](https://react.dev/)
+- [TypeScript](https://www.typescriptlang.org/)
+- [Tailwind CSS 4](https://tailwindcss.com/)
+- RAWG API for game data
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+
+- Node.js 20 or later
+- A RAWG API key. Create one from the [RAWG developer page](https://rawg.io/apidocs).
+
+### Installation
+
+1. Clone the repository and move into the project directory.
+2. Install dependencies:
+
+	```bash
+	npm install
+	```
+
+3. Create a `.env.local` file in the project root:
+
+	```env
+	RAWG_API_KEY=your_rawg_api_key
+	```
+
+4. Start the development server:
+
+	```bash
+	npm run dev
+	```
+
+5. Open [http://localhost:3000](http://localhost:3000).
+
+The API key is read server-side and should not be committed to source control.
+
+## Available Scripts
+
+```bash
+npm run dev    # Start the development server
+npm run lint   # Run ESLint
+npm run build  # Create a production build
+npm run start  # Start the production server
+```
+
+## Routes
+
+| Route | Description |
+| --- | --- |
+| `/` | Searchable and filterable game library |
+| `/games/[id]` | Details for a specific game |
+
+The home page accepts these query parameters:
+
+- `search` for a title search
+- `genre` for a RAWG genre slug
+- `platform` for a RAWG platform ID
+- `page` for pagination
+
+Example: `/?search=elden%20ring&genre=role-playing-games-rpg&page=1`
+
+## Project Structure
+
+```text
+app/
+├── components/       # Reusable browser and header components
+├── games/[id]/       # Game detail route and loading state
+├── lib/              # RAWG API clients, types, and formatters
+├── globals.css       # Global styles
+├── layout.tsx        # Root layout and metadata
+└── page.tsx          # Home page
+```
+
+## TODO
+
+Potential future improvements:
+
+- [ ] Add user accounts and authentication
+- [ ] Let users save favorite games
+- [ ] Add custom collections and wishlists
+- [ ] Add sorting by rating, release date, popularity, and title
+- [ ] Add filters for minimum rating and release year
+- [ ] Add infinite scrolling as an alternative to pagination
+- [ ] Add richer game metadata such as playtime, developers, and publishers
+- [ ] Add related and similar game recommendations
+- [ ] Add a comparison view for multiple games
+- [ ] Add shareable filter and collection links
+- [ ] Add automated tests for API helpers and filter behavior
+- [ ] Add image optimization and caching for API media
+
+
+## Getting Started
+
+To run the development server:
 
 ```bash
 npm run dev
@@ -15,22 +122,3 @@ bun dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
