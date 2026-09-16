@@ -2,7 +2,7 @@ import type { Game } from "../lib/types";
 import Link from "next/link";
 import { formatReleaseDate } from "../lib/formatters";
 
-export function Search({ genre, platform, query }: { genre: string; platform: string; query: string }) {
+export function Search({ genre, platform, query, tag }: { genre: string; platform: string; query: string; tag: string }) {
   return (
     <form
       className="mt-9 flex max-w-xl items-center gap-2 border-b border-[#657061] pb-3 focus-within:border-[#d7a94b]"
@@ -19,6 +19,7 @@ export function Search({ genre, platform, query }: { genre: string; platform: st
       />
       {genre && <input type="hidden" name="genre" value={genre} />}
       {platform && <input type="hidden" name="platform" value={platform} />}
+      {tag && <input type="hidden" name="tag" value={tag} />}
       <button className="text-xs font-bold uppercase tracking-[0.18em] text-[#d7a94b] transition hover:text-[#f3c66a]" type="submit">
         Search
       </button>
@@ -33,6 +34,7 @@ function GameBrowser({
   games,
   platform,
   search,
+  tag,
   totalPages,
 }: {
   currentPage: number;
@@ -41,6 +43,7 @@ function GameBrowser({
   games: Game[];
   platform: string;
   search: string;
+  tag: string;
   totalPages: number;
 }) {
   const gridGames = games;
@@ -49,6 +52,7 @@ function GameBrowser({
     if (search) params.set("search", search);
     if (genre) params.set("genre", genre);
     if (platform) params.set("platform", platform);
+    if (tag) params.set("tag", tag);
     params.set("page", String(page));
     return `/?${params.toString()}`;
   };
@@ -80,6 +84,7 @@ function GameBrowser({
         ].map((item) => {
           const params = new URLSearchParams();
           if (search) params.set("search", search);
+          if (tag) params.set("tag", tag);
           if (item.value) params.set("genre", item.value);
           if (item.value || search) params.set("page", "1");
 
@@ -111,6 +116,7 @@ function GameBrowser({
           const params = new URLSearchParams();
           if (search) params.set("search", search);
           if (genre) params.set("genre", genre);
+          if (tag) params.set("tag", tag);
           if (item.value) params.set("platform", item.value);
           if (item.value || genre || search) params.set("page", "1");
 

@@ -116,9 +116,13 @@ export default async function GameDetailsPage({
             {game.genres && game.genres.length > 0 && (
               <div className="mt-8 flex flex-wrap gap-2">
                 {game.genres.map((genre) => (
-                  <span className="border border-[#39433a] px-3 py-2 text-xs uppercase tracking-[0.12em] text-[#9da79a]" key={genre.slug}>
+                  <Link
+                    className="border border-[#39433a] px-3 py-2 text-xs uppercase tracking-[0.12em] text-[#9da79a] transition hover:border-[#d7a94b] hover:text-[#f8f5ed]"
+                    href={`/?genre=${encodeURIComponent(genre.slug)}&page=1`}
+                    key={genre.slug}
+                  >
                     {genre.name}
-                  </span>
+                  </Link>
                 ))}
               </div>
             )}
@@ -126,9 +130,13 @@ export default async function GameDetailsPage({
               <div className="mt-8">
                 <div className="flex flex-wrap gap-2">
                   {game.tags.slice(0, 3).map((tag) => (
-                    <span className="border border-[#39433a] px-3 py-2 text-[10px] uppercase tracking-[0.12em] text-[#9da79a]" key={tag.slug}>
+                    <Link
+                      className="border border-[#39433a] px-3 py-2 text-[10px] uppercase tracking-[0.12em] text-[#9da79a] transition hover:border-[#d7a94b] hover:text-[#f8f5ed]"
+                      href={`/?tag=${encodeURIComponent(tag.slug)}&page=1`}
+                      key={tag.slug}
+                    >
                       {tag.name}
-                    </span>
+                    </Link>
                   ))}
                 </div>
 
@@ -140,9 +148,13 @@ export default async function GameDetailsPage({
                     </summary>
                     <div className="mt-3 flex flex-wrap gap-2 border-t border-[#39433a] pt-3">
                       {game.tags.slice(3).map((tag) => (
-                        <span className="border border-[#39433a] px-3 py-2 text-[10px] uppercase tracking-[0.12em] text-[#9da79a]" key={tag.slug}>
+                        <Link
+                          className="border border-[#39433a] px-3 py-2 text-[10px] uppercase tracking-[0.12em] text-[#9da79a] transition hover:border-[#d7a94b] hover:text-[#f8f5ed]"
+                          href={`/?tag=${encodeURIComponent(tag.slug)}&page=1`}
+                          key={tag.slug}
+                        >
                           {tag.name}
-                        </span>
+                        </Link>
                       ))}
                     </div>
                   </details>
