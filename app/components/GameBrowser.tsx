@@ -1,5 +1,8 @@
-import type { Game } from "../lib/types";
+"use client";
+
+import { useState, type MouseEvent } from "react";
 import Link from "next/link";
+import type { Game } from "../lib/types";
 import { formatReleaseDate } from "../lib/formatters";
 
 export function Search({ genre, platform, query, tag }: { genre: string; platform: string; query: string; tag: string }) {
@@ -56,9 +59,16 @@ function GameBrowser({
     params.set("page", String(page));
     return `/?${params.toString()}`;
   };
+  const currentHref = pageHref(currentPage);
+  const [pendingHref, setPendingHref] = useState<string | null>(null);
+  const isLoading = pendingHref !== null && pendingHref !== currentHref;
+
+  const handleNavigation = (event: MouseEvent<HTMLAnchorElement>) => {
+    setPendingHref(event.currentTarget.getAttribute("href"));
+  };
 
   return (
-    <section id="discover" className="mx-auto max-w-7xl px-6 py-14 sm:px-10 lg:px-12">
+    <section id="discover" aria-busy={isLoading} className="mx-auto max-w-7xl px-6 py-14 sm:px-10 lg:px-12">
       <div className="flex flex-col justify-between gap-6 sm:flex-row sm:items-end">
         <div>
           <p className="text-xs font-bold uppercase tracking-[0.25em] text-[#d7a94b]">The library</p>
@@ -93,6 +103,7 @@ function GameBrowser({
               className={`whitespace-nowrap border px-4 py-2 text-xs font-bold uppercase tracking-[0.12em] transition ${genre === item.value ? "border-[#d7a94b] bg-[#d7a94b] text-[#151812]" : "border-[#343d35] text-[#9da79a] hover:border-[#d7a94b] hover:text-[#f8f5ed]"}`}
               href={params.toString() ? `/?${params.toString()}` : "/"}
               key={item.value || "all"}
+              onClick={handleNavigation}
             >
               {item.label}
             </Link>
@@ -125,6 +136,7 @@ function GameBrowser({
               className={`whitespace-nowrap border px-3 py-2 text-[11px] font-bold uppercase tracking-[0.1em] transition ${platform === item.value ? "border-[#d7a94b] bg-[#d7a94b] text-[#151812]" : "border-[#343d35] text-[#9da79a] hover:border-[#d7a94b] hover:text-[#f8f5ed]"}`}
               href={params.toString() ? `/?${params.toString()}` : "/"}
               key={item.value || "all"}
+              onClick={handleNavigation}
             >
               {item.label}
             </Link>
@@ -132,7 +144,19 @@ function GameBrowser({
         })}
       </div>
 
-      {error ? (
+      {isLoading ? (
+        <div className="mt-10 grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3" role="status" aria-label="Loading games">
+          {Array.from({ length: 6 }).map((_, index) => (
+            <div key={index}>
+              <div className="aspect-[4/3] animate-pulse bg-[#252c25]" />
+              <div className="border-b border-[#2d342e] py-4">
+                <div className="h-6 w-3/4 animate-pulse rounded-sm bg-[#1c211d]" />
+                <div className="mt-2 h-4 w-1/3 animate-pulse rounded-sm bg-[#171b18]" />
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : error ? (
         <div className="mt-10 border border-dashed border-[#465146] bg-[#171b18] px-6 py-16 text-center">
           <p className="font-serif text-2xl text-[#f8f5ed]">{error}</p>
         </div>
@@ -169,6 +193,7 @@ function GameBrowser({
             <Link
               className="border border-[#343d35] px-4 py-2 text-xs font-bold uppercase tracking-[0.12em] text-[#c3cabe] transition hover:border-[#d7a94b] hover:text-white"
               href={pageHref(currentPage - 1)}
+              onClick={handleNavigation}
             >
               Previous
             </Link>
@@ -180,6 +205,7 @@ function GameBrowser({
             <Link
               className="border border-[#d7a94b] px-4 py-2 text-xs font-bold uppercase tracking-[0.12em] text-[#d7a94b] transition hover:bg-[#d7a94b] hover:text-[#151812]"
               href={pageHref(currentPage + 1)}
+              onClick={handleNavigation}
             >
               Next
             </Link>
