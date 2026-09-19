@@ -12,7 +12,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html lang="en">
       <body>
         <Header />
-        <main id="top" className="min-h-screen bg-[#101211] text-[#f4f1e8]">
+        <main id="top" className="min-h-screen bg-game-background text-game-text-base">
           {children}
         </main>
       </body>

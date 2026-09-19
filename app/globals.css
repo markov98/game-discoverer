@@ -1,8 +1,55 @@
 @import "tailwindcss";
 
 :root {
-  background: #101211;
-  color: #f4f1e8;
+  --game-background: #101211;
+  --game-text-base: #f4f1e8;
+  --game-text: #f8f5ed;
+  --game-text-soft: #d4d8ce;
+  --game-text-muted: #c3cabe;
+  --game-text-subtle: #b8c0b4;
+  --game-text-dim: #9da79a;
+  --game-text-faint: #7f897e;
+  --game-text-quiet: #657061;
+  --game-accent: #d7a94b;
+  --game-accent-hover: #f3c66a;
+  --game-ink: #151812;
+  --game-surface: #171b18;
+  --game-surface-muted: #1c211d;
+  --game-surface-image: #252c25;
+  --game-border: #343d35;
+  --game-border-soft: #39433a;
+  --game-border-muted: #2d342e;
+  --game-border-faint: #2a302b;
+  --game-border-dashed: #465146;
+  --game-border-strong: #66705f;
+  --game-hero-start: #182019;
+  --game-hero-glow: #394931;
+  background: var(--game-background);
+  color: var(--game-text-base);
+}
+
+@theme inline {
+  --color-game-background: var(--game-background);
+  --color-game-text-base: var(--game-text-base);
+  --color-game-text: var(--game-text);
+  --color-game-text-soft: var(--game-text-soft);
+  --color-game-text-muted: var(--game-text-muted);
+  --color-game-text-subtle: var(--game-text-subtle);
+  --color-game-text-dim: var(--game-text-dim);
+  --color-game-text-faint: var(--game-text-faint);
+  --color-game-text-quiet: var(--game-text-quiet);
+  --color-game-accent: var(--game-accent);
+  --color-game-accent-hover: var(--game-accent-hover);
+  --color-game-ink: var(--game-ink);
+  --color-game-surface: var(--game-surface);
+  --color-game-surface-muted: var(--game-surface-muted);
+  --color-game-surface-image: var(--game-surface-image);
+  --color-game-border: var(--game-border);
+  --color-game-border-soft: var(--game-border-soft);
+  --color-game-border-muted: var(--game-border-muted);
+  --color-game-border-faint: var(--game-border-faint);
+  --color-game-border-dashed: var(--game-border-dashed);
+  --color-game-border-strong: var(--game-border-strong);
 }
 
 * {
@@ -11,7 +58,7 @@
 
 body {
   margin: 0;
-  background: #101211;
+  background: var(--game-background);
 }
 
 button,
@@ -20,6 +67,6 @@ input {
 }
 
 ::selection {
-  background: #d7a94b;
-  color: #151812;
+  background: var(--game-accent);
+  color: var(--game-ink);
 }
