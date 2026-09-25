@@ -44,3 +44,15 @@ export type RawgListResponse<T> = {
   previous: string | null;
   results: T[];
 };
+
+export type RawgCatalogItem = {
+  id: number;
+  name: string;
+  slug: string;
+  games_count?: number;
+  image_background?: string | null;
+};
+
+export type RawgTag = RawgCatalogItem;
+export type RawgGenre = RawgCatalogItem;
+export type RawgPlatform = RawgCatalogItem;

@@ -1,4 +1,4 @@
-import type { Game, GameDetails, GameScreenshot, GameStore, RawgListResponse } from './types';
+import type { Game, GameDetails, GameScreenshot, GameStore, RawgGenre, RawgListResponse, RawgPlatform, RawgTag } from './types';
 
 const RAWG_API_KEY = process.env.RAWG_API_KEY;
 const RAWG_API_URL = 'https://api.rawg.io/api';
@@ -24,6 +24,22 @@ async function fetchFromRawg<T>(path: string, params: Record<string, string | nu
   }
 
   return response.json() as Promise<T>;
+}
+
+async function fetchAllFromRawg<T>(path: string): Promise<T[]> {
+  const pageSize = 40;
+  const results: T[] = [];
+  let page = 1;
+  let hasNextPage = true;
+
+  while (hasNextPage) {
+    const data = await fetchFromRawg<RawgListResponse<T>>(path, { page, page_size: pageSize });
+    results.push(...data.results);
+    hasNextPage = Boolean(data.next);
+    page += 1;
+  }
+
+  return results;
 }
 
 async function fetchGames(query: string, page: number = 1, pageSize: number = 10): Promise<Game[]> {
@@ -56,6 +72,18 @@ async function fetchGamesPage(
 
 async function fetchGameDetails(gameId: number): Promise<GameDetails> {
   return fetchFromRawg<GameDetails>(`/games/${gameId}`);
+}
+
+async function fetchTags(): Promise<RawgTag[]> {
+  return fetchAllFromRawg<RawgTag>('/tags');
+}
+
+async function fetchGenres(): Promise<RawgGenre[]> {
+  return fetchAllFromRawg<RawgGenre>('/genres');
+}
+
+async function fetchPlatforms(): Promise<RawgPlatform[]> {
+  return fetchAllFromRawg<RawgPlatform>('/platforms');
 }
 
 async function fetchGameScreenshots(gameId: number): Promise<GameScreenshot[]> {
@@ -110,4 +138,4 @@ async function fetchGameStores(gameId: number): Promise<GameStore[]> {
   });
 }
 
-export { fetchGames, fetchGamesPage, fetchGameDetails, fetchGameScreenshots, fetchGameStores };
+export { fetchGames, fetchGamesPage, fetchGameDetails, fetchTags, fetchGenres, fetchPlatforms, fetchGameScreenshots, fetchGameStores };
