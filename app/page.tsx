@@ -19,12 +19,25 @@ async function getDiscoverGames(query: string, genre: string, platform: string, 
   }
 }
 
+function firstValue(value: string | string[] | undefined): string {
+  return Array.isArray(value) ? value[0] ?? "" : value ?? "";
+}
+
+function filterValue(value: string | string[] | undefined): string {
+  return Array.isArray(value) ? value.join(",") : value ?? "";
+}
+
 export default async function Home({
   searchParams,
 }: {
-  searchParams: Promise<{ search?: string; genre?: string; platform?: string; tag?: string; page?: string }>;
+  searchParams: Promise<{ search?: string | string[]; genre?: string | string[]; platform?: string | string[]; tag?: string | string[]; page?: string | string[] }>;
 }) {
-  const { search = "", genre = "", platform = "", tag = "", page: pageParam = "1" } = await searchParams;
+  const params = await searchParams;
+  const search = firstValue(params.search);
+  const genre = filterValue(params.genre);
+  const platform = filterValue(params.platform);
+  const tag = filterValue(params.tag);
+  const pageParam = firstValue(params.page) || "1";
   const requestedPage = Number.parseInt(pageParam, 10);
   const currentPage = Number.isFinite(requestedPage) && requestedPage > 0 ? requestedPage : 1;
   const { games, total, error } = await getDiscoverGames(search, genre, platform, tag, currentPage);

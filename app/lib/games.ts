@@ -86,6 +86,16 @@ async function fetchPlatforms(): Promise<RawgPlatform[]> {
   return fetchAllFromRawg<RawgPlatform>('/platforms');
 }
 
+async function fetchSearchFilterOptions(): Promise<{ genres: RawgGenre[]; platforms: RawgPlatform[]; tags: RawgTag[] }> {
+  const [genres, platforms, tags] = await Promise.all([
+    fetchFromRawg<RawgListResponse<RawgGenre>>('/genres', { page: 1, page_size: 40 }),
+    fetchFromRawg<RawgListResponse<RawgPlatform>>('/platforms', { page: 1, page_size: 40 }),
+    fetchFromRawg<RawgListResponse<RawgTag>>('/tags', { page: 1, page_size: 40 }),
+  ]);
+
+  return { genres: genres.results, platforms: platforms.results, tags: tags.results };
+}
+
 async function fetchGameScreenshots(gameId: number): Promise<GameScreenshot[]> {
   const data = await fetchFromRawg<RawgListResponse<GameScreenshot>>(`/games/${gameId}/screenshots`);
   return data.results;
@@ -138,4 +148,4 @@ async function fetchGameStores(gameId: number): Promise<GameStore[]> {
   });
 }
 
-export { fetchGames, fetchGamesPage, fetchGameDetails, fetchTags, fetchGenres, fetchPlatforms, fetchGameScreenshots, fetchGameStores };
+export { fetchGames, fetchGamesPage, fetchGameDetails, fetchTags, fetchGenres, fetchPlatforms, fetchSearchFilterOptions, fetchGameScreenshots, fetchGameStores };
