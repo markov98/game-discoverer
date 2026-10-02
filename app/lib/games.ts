@@ -56,6 +56,7 @@ async function fetchGamesPage(
   genre?: string,
   platform?: string,
   tag?: string,
+  developer?: string,
 ): Promise<RawgListResponse<Game>> {
   const data = await fetchFromRawg<RawgListResponse<Game>>('/games', {
     search: query,
@@ -65,6 +66,7 @@ async function fetchGamesPage(
     genres: genre,
     platforms: platform,
     tags: tag,
+    developers: developer,
   });
 
   return data;
@@ -74,11 +76,11 @@ async function fetchGameDetails(gameId: number): Promise<GameDetails> {
   return fetchFromRawg<GameDetails>(`/games/${gameId}`);
 }
 
-
-async function fetchSimilarGames(gameId: number): Promise<Game[]> {
-  const data = await fetchFromRawg<RawgListResponse<Game>>(`/games/${gameId}/suggested`);
-  return data.results;
+async function fetchGamesByDeveloper(developerId: number, excludeGameId: number): Promise<Game[]> {
+  const data = await fetchGamesPage('', 1, 4, '-rating', undefined, undefined, undefined, String(developerId));
+  return data.results.filter((game) => game.id !== excludeGameId).slice(0, 3);
 }
+
 
 async function fetchTags(): Promise<RawgTag[]> {
   return fetchAllFromRawg<RawgTag>('/tags');
@@ -154,4 +156,4 @@ async function fetchGameStores(gameId: number): Promise<GameStore[]> {
   });
 }
 
-export { fetchGames, fetchGamesPage, fetchGameDetails, fetchTags, fetchGenres, fetchPlatforms, fetchSearchFilterOptions, fetchGameScreenshots, fetchGameStores, fetchSimilarGames };
+export { fetchGames, fetchGamesPage, fetchGameDetails, fetchGamesByDeveloper, fetchTags, fetchGenres, fetchPlatforms, fetchSearchFilterOptions, fetchGameScreenshots, fetchGameStores };

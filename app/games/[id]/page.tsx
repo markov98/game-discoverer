@@ -1,8 +1,8 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { fetchGameDetails, fetchGameScreenshots, fetchGameStores } from "@/app/lib/games";
-import type { GameDetails, GameScreenshot } from "@/app/lib/types";
+import { fetchGameDetails, fetchGameScreenshots, fetchGameStores, fetchGamesByDeveloper } from "@/app/lib/games";
+import type { Game, GameDetails, GameScreenshot } from "@/app/lib/types";
 
 function formatReleaseDate(released?: string | null) {
   if (!released) return "Coming soon";
@@ -18,17 +18,22 @@ function stripHtmlAndNormalize(description?: string) {
   return description?.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
 }
 
-async function getGame(id: number): Promise<{ game?: GameDetails; screenshots: GameScreenshot[]; storeLinks: Array<{ id: number; url: string; label: string }>; error?: string }> {
+async function getGame(id: number): Promise<{ game?: GameDetails; screenshots: GameScreenshot[]; developerGames: Game[]; storeLinks: Array<{ id: number; url: string; label: string }>; error?: string }> {
   try {
     const [game, screenshots, stores] = await Promise.all([
       fetchGameDetails(id),
       fetchGameScreenshots(id),
       fetchGameStores(id),
     ]);
+    const developer = game.developers?.[0];
+    const developerGames = developer
+      ? await fetchGamesByDeveloper(developer.id, id).catch(() => [])
+      : [];
 
     return {
       game,
       screenshots,
+      developerGames,
       storeLinks: (stores ?? [])
         .filter((store) => Boolean(store?.url))
         .map((store) => ({
@@ -41,6 +46,7 @@ async function getGame(id: number): Promise<{ game?: GameDetails; screenshots: G
     return {
       game: undefined,
       screenshots: [],
+      developerGames: [],
       storeLinks: [],
       error: "API Problem, please try again later.",
     };
@@ -74,7 +80,7 @@ export default async function GameDetailsPage({
   const id = Number.parseInt((await params).id, 10);
   if (!Number.isInteger(id)) notFound();
 
-  const { game, screenshots, storeLinks, error } = await getGame(id);
+  const { game, screenshots, developerGames, storeLinks, error } = await getGame(id);
 
   if (!game) {
     return (
@@ -194,6 +200,35 @@ export default async function GameDetailsPage({
             </div>
           </section>
         )}
+
+        {developerGames.length > 0 && (
+          <section className="mt-16 border-t border-game-border-faint pt-10">
+            <h2 className="font-serif text-4xl text-game-text">More from {game.developers?.[0]?.name}</h2>
+            <div className="mt-6 grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
+              {developerGames.slice(0, 3).map((developerGame) => (
+                <Link className="group" href={`/games/${developerGame.id}`} key={developerGame.id}>
+                  <article>
+                    <div className="aspect-[4/3] overflow-hidden bg-game-surface-image">
+                      <img
+                        alt={developerGame.name}
+                        className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+                        src={developerGame.background_image ?? ""}
+                      />
+                    </div>
+                    <div className="flex items-start justify-between gap-4 border-b border-game-border-muted py-4">
+                      <div>
+                        <h3 className="font-serif text-2xl text-game-text">{developerGame.name}</h3>
+                        <p className="mt-1 text-sm text-game-text-faint">{formatReleaseDate(developerGame.released)}</p>
+                      </div>
+                      <span className="pt-1 text-sm text-game-accent">* {developerGame.rating?.toFixed(1) ?? "-"}</span>
+                    </div>
+                  </article>
+                </Link>
+              ))}
+            </div>
+          </section>
+        )}
+
       </div>
     </div>
   );
