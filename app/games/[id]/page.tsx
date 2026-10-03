@@ -118,6 +118,22 @@ export default async function GameDetailsPage({
               <span>{formatReleaseDate(game.released)}</span>
               {game.metacritic && <span>{game.metacritic} Metacritic</span>}
             </div>
+            {(game.developers?.length || game.publishers?.length) ? (
+              <dl className="mt-5 grid gap-x-8 gap-y-3 text-sm sm:grid-cols-2">
+                {game.developers && game.developers.length > 0 && (
+                  <div>
+                    <dt className="text-xs font-bold uppercase tracking-[0.12em] text-game-text-quiet">Developer</dt>
+                    <dd className="mt-1 text-game-text-dim">{game.developers.map((developer) => developer.name).join(", ")}</dd>
+                  </div>
+                )}
+                {game.publishers && game.publishers.length > 0 && (
+                  <div>
+                    <dt className="text-xs font-bold uppercase tracking-[0.12em] text-game-text-quiet">Publisher</dt>
+                    <dd className="mt-1 text-game-text-dim">{game.publishers.map((publisher) => publisher.name).join(", ")}</dd>
+                  </div>
+                )}
+              </dl>
+            ) : null}
             <p className="mt-8 max-w-2xl text-base leading-8 text-game-text-subtle">{description}</p>
             {game.genres && game.genres.length > 0 && (
               <div className="mt-8 flex flex-wrap gap-2">

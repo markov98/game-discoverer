@@ -30,6 +30,7 @@ export type GameDetails = Game & {
   website?: string | null;
   reddit_url?: string | null;
   developers?: Array<{ id: number; name: string; slug?: string }>;
+  publishers?: Array<{ id: number; name: string; slug?: string }>;
 };
 
 export type GameScreenshot = {
