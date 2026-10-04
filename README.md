@@ -1,16 +1,17 @@
 # GameDiscoverer
 
-GameDiscoverer is a fast, focused game discovery app powered by the [RAWG Video Games Database API](https://rawg.io/apidocs). Browse a library of games, search by title, filter by genre or platform, and open a details page with ratings, release information, screenshots, and store links.
+GameDiscoverer is a fast, focused game discovery app powered by the [RAWG Video Games Database API](https://rawg.io/apidocs). Browse a library of games, search by title, filter by genre, platform, and tag, and open detailed game pages with ratings, screenshots, store links, and recommendations.
 
 The project is deployed here: [game-discoverer.vercel.app](game-discoverer.vercel.app)
 
 ## Features
 
-- Search games by title
-- Filter results by genre and platform
-- Paginate through the game library
-- View game ratings, release dates, genres, and descriptions
-- Browse screenshots and links to official websites and stores
+- Search games by title from the home page and advanced search page
+- Filter results by genre, platform, and tags
+- Browse a featured game highlight, library cards, and pagination
+- View game ratings, release dates, genres, descriptions, and metadata
+- Explore screenshots and official store links on each game detail page
+- Discover more games from the same developer on the detail view
 - Loading states for the home page and game detail pages
 - Responsive layout for desktop and mobile screens
 
@@ -68,27 +69,32 @@ npm run start  # Start the production server
 | Route | Description |
 | --- | --- |
 | `/` | Searchable and filterable game library |
+| `/search` | Advanced search form with multi-select genre and tag filters |
 | `/games/[id]` | Details for a specific game |
 
 The home page accepts these query parameters:
 
 - `search` for a title search
-- `genre` for a RAWG genre slug
+- `genre` for a RAWG genre slug (supports multiple values)
 - `platform` for a RAWG platform ID
+- `tag` for a RAWG tag slug (supports multiple values)
 - `page` for pagination
 
-Example: `/?search=elden%20ring&genre=role-playing-games-rpg&page=1`
+Example: `/?search=elden%20ring&genre=role-playing-games-rpg&tag=singleplayer&page=1`
 
 ## Project Structure
 
 ```text
 app/
 ├── components/       # Reusable browser and header components
-├── games/[id]/       # Game detail route and loading state
+├── games/[id]/       # Game detail route, screenshots, and related games
+├── search/           # Advanced search UI with multi-select filters
 ├── lib/              # RAWG API clients, types, and formatters
 ├── globals.css       # Global styles
 ├── layout.tsx        # Root layout and metadata
-└── page.tsx          # Home page
+├── loading.tsx       # Shared loading state
+├── page.tsx          # Home page
+└── search/page.tsx   # Advanced search page
 ```
 
 ## TODO
