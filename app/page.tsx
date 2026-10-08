@@ -1,7 +1,7 @@
 import GameBrowser, { Search } from "@/app/components/GameBrowser";
 import type { Metadata } from "next";
 import Link from "next/link";
-import { fetchGamesPage } from "./lib/games";
+import { fetchGames } from "./lib/games";
 import { formatReleaseDate } from "./lib/formatters";
 
 const pageSize = 12;
@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 
 async function getDiscoverGames(query: string, genre: string, platform: string, tag: string, page: number) {
   try {
-    const data = await fetchGamesPage(query, page, pageSize, undefined, genre, platform, tag);
+    const data = await fetchGames(query, page, pageSize, undefined, genre, platform, tag);
     return { games: data.results, total: data.count, error: null };
   } catch {
     return { games: [], total: 0, error: "API Problem, please try again later." };
