@@ -58,3 +58,22 @@ export type RawgCatalogItem = {
 export type RawgTag = RawgCatalogItem;
 export type RawgGenre = RawgCatalogItem;
 export type RawgPlatform = RawgCatalogItem;
+
+export type RawgDeveloper = RawgCatalogItem;
+export type RawgPublisher = RawgCatalogItem;
+
+export type RawgRelatedGame = {
+  id: number;
+  slug: string;
+  name: string;
+  added?: number;
+};
+
+export type RawgOrganizationDetails = RawgCatalogItem & {
+  description?: string;
+  website?: string | null;
+  games?: RawgRelatedGame[];
+};
+
+export type RawgDeveloperDetails = RawgOrganizationDetails;
+export type RawgPublisherDetails = RawgOrganizationDetails;
