@@ -1,46 +1,11 @@
-import type { Game, GameDetails, GameScreenshot, GameStore, RawgDeveloper, RawgDeveloperDetails, RawgGenre, RawgListResponse, RawgPlatform, RawgPublisher, RawgPublisherDetails, RawgTag } from './types';
-
-const RAWG_API_KEY = process.env.RAWG_API_KEY;
-const RAWG_API_URL = 'https://api.rawg.io/api';
-
-async function fetchFromRawg<T>(path: string, params: Record<string, string | number | undefined> = {}): Promise<T> {
-  if (!RAWG_API_KEY) {
-    throw new Error('RAWG_API_KEY is not defined');
-  }
-
-  const url = new URL(`${RAWG_API_URL}${path}`);
-  url.searchParams.set('key', RAWG_API_KEY);
-
-  Object.entries(params).forEach(([key, value]) => {
-    if (value !== undefined && value !== '') {
-      url.searchParams.set(key, String(value));
-    }
-  });
-
-  const response = await fetch(url.toString());
-
-  if (!response.ok) {
-    throw new Error(`Error fetching ${path}: ${response.statusText}`);
-  }
-
-  return response.json() as Promise<T>;
-}
-
-async function fetchAllFromRawg<T>(path: string): Promise<T[]> {
-  const pageSize = 40;
-  const results: T[] = [];
-  let page = 1;
-  let hasNextPage = true;
-
-  while (hasNextPage) {
-    const data = await fetchFromRawg<RawgListResponse<T>>(path, { page, page_size: pageSize });
-    results.push(...data.results);
-    hasNextPage = Boolean(data.next);
-    page += 1;
-  }
-
-  return results;
-}
+import type {
+  Game,
+  GameDetails,
+  GameScreenshot,
+  GameStore,
+  RawgListResponse,
+} from "./types";
+import { fetchFromRawg } from "./rawg-client";
 
 async function fetchGames(
   query: string,
@@ -52,7 +17,7 @@ async function fetchGames(
   tag?: string,
   developer?: string,
 ): Promise<RawgListResponse<Game>> {
-  const data = await fetchFromRawg<RawgListResponse<Game>>('/games', {
+  return fetchFromRawg<RawgListResponse<Game>>("/games", {
     search: query,
     page,
     page_size: pageSize,
@@ -62,8 +27,6 @@ async function fetchGames(
     tags: tag,
     developers: developer,
   });
-
-  return data;
 }
 
 async function fetchGameDetails(gameId: number): Promise<GameDetails> {
@@ -71,47 +34,8 @@ async function fetchGameDetails(gameId: number): Promise<GameDetails> {
 }
 
 async function fetchGamesByDeveloper(developerId: number, excludeGameId: number): Promise<Game[]> {
-  const data = await fetchGames('', 1, 4, '-rating', undefined, undefined, undefined, String(developerId));
+  const data = await fetchGames("", 1, 4, "-rating", undefined, undefined, undefined, String(developerId));
   return data.results.filter((game) => game.id !== excludeGameId).slice(0, 3);
-}
-
-
-async function fetchTags(): Promise<RawgTag[]> {
-  return fetchAllFromRawg<RawgTag>('/tags');
-}
-
-async function fetchGenres(): Promise<RawgGenre[]> {
-  return fetchAllFromRawg<RawgGenre>('/genres');
-}
-
-async function fetchPlatforms(): Promise<RawgPlatform[]> {
-  return fetchAllFromRawg<RawgPlatform>('/platforms');
-}
-
-async function fetchDevelopers(): Promise<RawgDeveloper[]> {
-  return fetchAllFromRawg<RawgDeveloper>('/developers');
-}
-
-async function fetchDeveloperDetails(developerId: number): Promise<RawgDeveloperDetails> {
-  return fetchFromRawg<RawgDeveloperDetails>(`/developers/${developerId}`);
-}
-
-async function fetchPublishers(): Promise<RawgPublisher[]> {
-  return fetchAllFromRawg<RawgPublisher>('/publishers');
-}
-
-async function fetchPublisherDetails(publisherId: number): Promise<RawgPublisherDetails> {
-  return fetchFromRawg<RawgPublisherDetails>(`/publishers/${publisherId}`);
-}
-
-async function fetchSearchFilterOptions(): Promise<{ genres: RawgGenre[]; platforms: RawgPlatform[]; tags: RawgTag[] }> {
-  const [genres, platforms, tags] = await Promise.all([
-    fetchFromRawg<RawgListResponse<RawgGenre>>('/genres', { page: 1, page_size: 40 }),
-    fetchFromRawg<RawgListResponse<RawgPlatform>>('/platforms', { page: 1, page_size: 40 }),
-    fetchFromRawg<RawgListResponse<RawgTag>>('/tags', { page: 1, page_size: 40 }),
-  ]);
-
-  return { genres: genres.results, platforms: platforms.results, tags: tags.results };
 }
 
 async function fetchGameScreenshots(gameId: number): Promise<GameScreenshot[]> {
@@ -119,7 +43,9 @@ async function fetchGameScreenshots(gameId: number): Promise<GameScreenshot[]> {
   return data.results;
 }
 
-async function fetchStoreDetails(storeId: number): Promise<{ id: number; name: string; slug: string; domain?: string | null }> {
+async function fetchStoreDetails(
+  storeId: number,
+): Promise<{ id: number; name: string; slug: string; domain?: string | null }> {
   return fetchFromRawg<{ id: number; name: string; slug: string; domain?: string | null }>(`/stores/${storeId}`);
 }
 
@@ -152,7 +78,9 @@ async function fetchGameStores(gameId: number): Promise<GameStore[]> {
   );
 
   const storeLookup = new Map(
-    storeDetails.filter((store): store is { id: number; name: string; slug: string; domain?: string | null } => Boolean(store)).map((store) => [store.id, store]),
+    storeDetails
+      .filter((store): store is { id: number; name: string; slug: string; domain?: string | null } => Boolean(store))
+      .map((store) => [store.id, store]),
   );
 
   return rawStores.map((store) => {
@@ -166,4 +94,10 @@ async function fetchGameStores(gameId: number): Promise<GameStore[]> {
   });
 }
 
-export { fetchGames, fetchGameDetails, fetchGamesByDeveloper, fetchTags, fetchGenres, fetchPlatforms, fetchDevelopers, fetchDeveloperDetails, fetchPublishers, fetchPublisherDetails, fetchSearchFilterOptions, fetchGameScreenshots, fetchGameStores };
+export {
+  fetchGames,
+  fetchGameDetails,
+  fetchGamesByDeveloper,
+  fetchGameScreenshots,
+  fetchGameStores,
+};

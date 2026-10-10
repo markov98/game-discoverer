@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { fetchSearchFilterOptions } from "../lib/games";
+import { fetchSearchFilterOptions } from "../lib/catalogs";
 
 export const metadata: Metadata = {
   title: "Advanced game search | GameDiscoverer",
