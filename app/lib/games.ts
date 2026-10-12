@@ -38,6 +38,21 @@ async function fetchGamesByDeveloper(developerId: number, excludeGameId: number)
   return data.results.filter((game) => game.id !== excludeGameId).slice(0, 3);
 }
 
+async function fetchAllGamesByDeveloper(developerId: number): Promise<Game[]> {
+  const games: Game[] = [];
+  let page = 1;
+  let hasNextPage = true;
+
+  while (hasNextPage) {
+    const data = await fetchGames("", page, 40, "-rating", undefined, undefined, undefined, String(developerId));
+    games.push(...data.results);
+    hasNextPage = Boolean(data.next);
+    page += 1;
+  }
+
+  return games;
+}
+
 async function fetchGameScreenshots(gameId: number): Promise<GameScreenshot[]> {
   const data = await fetchFromRawg<RawgListResponse<GameScreenshot>>(`/games/${gameId}/screenshots`);
   return data.results;
@@ -98,6 +113,7 @@ export {
   fetchGames,
   fetchGameDetails,
   fetchGamesByDeveloper,
+  fetchAllGamesByDeveloper,
   fetchGameScreenshots,
   fetchGameStores,
 };

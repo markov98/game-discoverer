@@ -123,7 +123,13 @@ export default async function GameDetailsPage({
                 {game.developers && game.developers.length > 0 && (
                   <div>
                     <dt className="text-xs font-bold uppercase tracking-[0.12em] text-game-text-quiet">Developer</dt>
-                    <dd className="mt-1 text-game-text-dim">{game.developers.map((developer) => developer.name).join(", ")}</dd>
+                    <dd className="mt-1 flex flex-wrap gap-x-3 gap-y-1 text-game-text-dim">
+                      {game.developers.map((developer) => (
+                        <Link className="transition hover:text-game-accent" href={`/developers/${developer.id}`} key={developer.id}>
+                          {developer.name}
+                        </Link>
+                      ))}
+                    </dd>
                   </div>
                 )}
                 {game.publishers && game.publishers.length > 0 && (
