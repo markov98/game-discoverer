@@ -9,6 +9,7 @@ The project is deployed here: [game-discoverer.vercel.app](game-discoverer.verce
 - Search games by title from the home page and advanced search page
 - Filter results by genre, platform, and tags
 - Browse a featured game highlight, library cards, and pagination
+- Scroll through a developer's games, loaded a page at a time
 - View game ratings, release dates, genres, descriptions, and metadata
 - Explore screenshots and official store links on each game detail page
 - Discover more games from the same developer on the detail view
@@ -53,7 +54,7 @@ The project is deployed here: [game-discoverer.vercel.app](game-discoverer.verce
 
 5. Open [http://localhost:3000](http://localhost:3000).
 
-The API key is read server-side and should not be committed to source control.
+The API key is read server-side and should not be committed to source control. Developer-game pagination requests additional pages through `/api/developers/[id]/games`; the RAWG key is only used by the server-side handler.
 
 ## Available Scripts
 
@@ -71,6 +72,8 @@ npm run start  # Start the production server
 | `/` | Searchable and filterable game library |
 | `/search` | Advanced search form with multi-select genre and tag filters |
 | `/games/[id]` | Details for a specific game |
+| `/developers/[id]` | Developer details and an infinitely scrolling game list |
+| `/api/developers/[id]/games?page=<page>` | Server-side pagination endpoint for a developer's games |
 
 The home page accepts these query parameters:
 
@@ -87,6 +90,8 @@ Example: `/?search=elden%20ring&genre=role-playing-games-rpg&tag=singleplayer&pa
 ```text
 app/
 ├── components/       # Reusable browser and header components
+├── api/              # Server-side API routes
+├── developers/[id]/  # Developer details and paginated games
 ├── games/[id]/       # Game detail route, screenshots, and related games
 ├── search/           # Advanced search UI with multi-select filters
 ├── lib/              # RAWG API clients, types, and formatters
@@ -106,12 +111,10 @@ Potential future improvements:
 - [ ] Add custom collections and wishlists
 - [ ] Add sorting by rating, release date, popularity, and title
 - [ ] Add filters for minimum rating and release year
-- [ ] Add infinite scrolling as an alternative to pagination
 - [ ] Add richer game metadata such as playtime, developers, and publishers
 - [ ] Add related and similar game recommendations
 - [ ] Add a comparison view for multiple games
 - [ ] Add shareable filter and collection links
 - [ ] Add automated tests for API helpers and filter behavior
 - [ ] Add image optimization and caching for API media
-
 
