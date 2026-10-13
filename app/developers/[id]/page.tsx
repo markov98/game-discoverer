@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { fetchDeveloperDetails } from "@/app/lib/catalogs";
-import { formatReleaseDate } from "@/app/lib/formatters";
-import { fetchAllGamesByDeveloper } from "@/app/lib/games";
+import { fetchDeveloperGames } from "@/app/lib/games";
 import type { Game, RawgDeveloperDetails } from "@/app/lib/types";
+import DeveloperGames from "./DeveloperGames";
 
 function stripHtmlAndNormalize(description?: string) {
   return description?.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
@@ -13,18 +13,27 @@ function stripHtmlAndNormalize(description?: string) {
 async function getDeveloper(id: number): Promise<{
   developer?: RawgDeveloperDetails;
   games: Game[];
+  totalGames: number;
+  hasMore: boolean;
   error?: string;
 }> {
   try {
     const [developer, games] = await Promise.all([
       fetchDeveloperDetails(id),
-      fetchAllGamesByDeveloper(id),
+      fetchDeveloperGames(id),
     ]);
 
-    return { developer, games };
+    return {
+      developer,
+      games: games.results,
+      totalGames: games.count,
+      hasMore: Boolean(games.next),
+    };
   } catch {
     return {
       games: [],
+      totalGames: 0,
+      hasMore: false,
       error: "API Problem, please try again later.",
     };
   }
@@ -57,7 +66,7 @@ export default async function DeveloperDetailsPage({
   const id = Number.parseInt((await params).id, 10);
   if (!Number.isInteger(id) || id <= 0) notFound();
 
-  const { developer, games, error } = await getDeveloper(id);
+  const { developer, games, totalGames, hasMore, error } = await getDeveloper(id);
 
   if (!developer) {
     return (
@@ -81,7 +90,7 @@ export default async function DeveloperDetailsPage({
         <p className="text-xs font-bold uppercase tracking-[0.25em] text-game-accent">Developer</p>
         <h1 className="mt-4 font-serif text-5xl leading-none text-game-text sm:text-7xl">{developer.name}</h1>
         <p className="mt-5 text-sm text-game-text-muted">
-          {games.length} {games.length === 1 ? "game" : "games"}
+          {totalGames} {totalGames === 1 ? "game" : "games"}
         </p>
         {description && <p className="mt-6 max-w-3xl text-base leading-8 text-game-text-subtle">{description}</p>}
         {developer.website && (
@@ -98,32 +107,7 @@ export default async function DeveloperDetailsPage({
 
       <section className="pt-10">
         <h2 className="font-serif text-4xl text-game-text">Games by {developer.name}</h2>
-        {games.length > 0 ? (
-          <div className="mt-6 grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
-            {games.map((game) => (
-              <Link className="group" href={`/games/${game.id}`} key={game.id}>
-                <article>
-                  <div className="aspect-[4/3] overflow-hidden bg-game-surface-image">
-                    <img
-                      alt={game.name}
-                      className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
-                      src={game.background_image ?? ""}
-                    />
-                  </div>
-                  <div className="flex items-start justify-between gap-4 border-b border-game-border-muted py-4">
-                    <div>
-                      <h3 className="font-serif text-2xl text-game-text">{game.name}</h3>
-                      <p className="mt-1 text-sm text-game-text-faint">{formatReleaseDate(game.released)}</p>
-                    </div>
-                    <span className="pt-1 text-sm text-game-accent">* {game.rating?.toFixed(1) ?? "-"}</span>
-                  </div>
-                </article>
-              </Link>
-            ))}
-          </div>
-        ) : (
-          <p className="mt-6 text-sm text-game-text-muted">No games found for this developer.</p>
-        )}
+        <DeveloperGames developerId={id} initialGames={games} initialHasMore={hasMore} />
       </section>
     </div>
   );

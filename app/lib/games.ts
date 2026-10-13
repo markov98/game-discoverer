@@ -7,6 +7,8 @@ import type {
 } from "./types";
 import { fetchFromRawg } from "./rawg-client";
 
+const developerGamesPageSize = 20;
+
 async function fetchGames(
   query: string,
   page: number = 1,
@@ -38,19 +40,8 @@ async function fetchGamesByDeveloper(developerId: number, excludeGameId: number)
   return data.results.filter((game) => game.id !== excludeGameId).slice(0, 3);
 }
 
-async function fetchAllGamesByDeveloper(developerId: number): Promise<Game[]> {
-  const games: Game[] = [];
-  let page = 1;
-  let hasNextPage = true;
-
-  while (hasNextPage) {
-    const data = await fetchGames("", page, 40, "-rating", undefined, undefined, undefined, String(developerId));
-    games.push(...data.results);
-    hasNextPage = Boolean(data.next);
-    page += 1;
-  }
-
-  return games;
+async function fetchDeveloperGames(developerId: number, page: number = 1): Promise<RawgListResponse<Game>> {
+  return fetchGames("", page, developerGamesPageSize, "-rating", undefined, undefined, undefined, String(developerId));
 }
 
 async function fetchGameScreenshots(gameId: number): Promise<GameScreenshot[]> {
@@ -113,7 +104,7 @@ export {
   fetchGames,
   fetchGameDetails,
   fetchGamesByDeveloper,
-  fetchAllGamesByDeveloper,
+  fetchDeveloperGames,
   fetchGameScreenshots,
   fetchGameStores,
 };
