@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 
 async function getDiscoverGames(query: string, genre: string, platform: string, tag: string, page: number) {
   try {
-    const data = await fetchGames(query, page, pageSize, undefined, genre, platform, tag);
+    const data = await fetchGames({ query, page, pageSize, genre, platform, tag });
     return { games: data.results, total: data.count, error: null };
   } catch {
     return { games: [], total: 0, error: "API Problem, please try again later." };
