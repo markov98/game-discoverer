@@ -6,6 +6,7 @@ const RAWG_API_URL = "https://api.rawg.io/api";
 export async function fetchFromRawg<T>(
   path: string,
   params: Record<string, string | number | undefined> = {},
+  options: { next?: { revalidate?: number } } = {},
 ): Promise<T> {
   if (!RAWG_API_KEY) {
     throw new Error("RAWG_API_KEY is not defined");
@@ -20,7 +21,7 @@ export async function fetchFromRawg<T>(
     }
   });
 
-  const response = await fetch(url.toString());
+  const response = await fetch(url.toString(), options);
 
   if (!response.ok) {
     throw new Error(`Error fetching ${path}: ${response.statusText}`);

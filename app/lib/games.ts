@@ -32,7 +32,7 @@ async function fetchGames(
 }
 
 async function fetchGameDetails(gameId: number): Promise<GameDetails> {
-  return fetchFromRawg<GameDetails>(`/games/${gameId}`);
+  return fetchFromRawg<GameDetails>(`/games/${gameId}`, {}, { next: { revalidate: 3600 } });
 }
 
 async function fetchGamesByDeveloper(developerId: number, excludeGameId: number): Promise<Game[]> {
