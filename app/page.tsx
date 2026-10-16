@@ -82,6 +82,7 @@ export default async function Home({
       </section>
 
       <GameBrowser
+        key={JSON.stringify([search, genre, platform, tag, currentPage])}
         currentPage={Math.min(currentPage, totalPages)}
         error={error}
         games={games}

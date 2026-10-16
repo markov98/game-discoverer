@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type MouseEvent } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import type { Game } from "../lib/types";
 import { formatReleaseDate } from "../lib/formatters";
@@ -50,6 +50,10 @@ function GameBrowser({
   totalPages: number;
 }) {
   const gridGames = games;
+  const [isLoading, setIsLoading] = useState(false);
+  const handleNavigation = () => setIsLoading(true);
+  const filterHref = (params: URLSearchParams) =>
+    params.toString() ? `/?${params.toString()}` : "/";
   const pageHref = (page: number) => {
     const params = new URLSearchParams();
     if (search) params.set("search", search);
@@ -57,18 +61,11 @@ function GameBrowser({
     if (platform) params.set("platform", platform);
     if (tag) params.set("tag", tag);
     params.set("page", String(page));
-    return `/?${params.toString()}`;
-  };
-  const currentHref = pageHref(currentPage);
-  const [pendingHref, setPendingHref] = useState<string | null>(null);
-  const isLoading = pendingHref !== null && pendingHref !== currentHref;
-
-  const handleNavigation = (event: MouseEvent<HTMLAnchorElement>) => {
-    setPendingHref(event.currentTarget.getAttribute("href"));
+    return `${filterHref(params)}#discover`;
   };
 
   return (
-    <section id="discover" aria-busy={isLoading} className="mx-auto max-w-7xl px-6 py-14 sm:px-10 lg:px-12">
+    <section id="discover" className="mx-auto max-w-7xl px-6 py-14 sm:px-10 lg:px-12">
       <div className="flex flex-col justify-between gap-6 sm:flex-row sm:items-end">
         <div>
           <p className="text-xs font-bold uppercase tracking-[0.25em] text-game-accent">The library</p>
@@ -101,9 +98,10 @@ function GameBrowser({
           return (
             <Link
               className={`whitespace-nowrap border px-4 py-2 text-xs font-bold uppercase tracking-[0.12em] transition ${genre === item.value ? "border-game-accent bg-game-accent text-game-ink" : "border-game-border text-game-text-dim hover:border-game-accent hover:text-game-text"}`}
-              href={params.toString() ? `/?${params.toString()}` : "/"}
+              href={filterHref(params)}
               key={item.value || "all"}
-              onClick={handleNavigation}
+              onClick={genre !== item.value || currentPage !== 1 ? handleNavigation : undefined}
+              scroll={false}
             >
               {item.label}
             </Link>
@@ -134,9 +132,10 @@ function GameBrowser({
           return (
             <Link
               className={`whitespace-nowrap border px-3 py-2 text-[11px] font-bold uppercase tracking-[0.1em] transition ${platform === item.value ? "border-game-accent bg-game-accent text-game-ink" : "border-game-border text-game-text-dim hover:border-game-accent hover:text-game-text"}`}
-              href={params.toString() ? `/?${params.toString()}` : "/"}
+              href={filterHref(params)}
               key={item.value || "all"}
-              onClick={handleNavigation}
+              onClick={platform !== item.value || currentPage !== 1 ? handleNavigation : undefined}
+              scroll={false}
             >
               {item.label}
             </Link>
@@ -146,7 +145,7 @@ function GameBrowser({
 
       {isLoading ? (
         <div className="mt-10 grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3" role="status" aria-label="Loading games">
-          {Array.from({ length: 6 }).map((_, index) => (
+          {Array.from({ length: 6 }, (_, index) => (
             <div key={index}>
               <div className="aspect-[4/3] animate-pulse bg-game-surface-image" />
               <div className="border-b border-game-border-muted py-4">

@@ -16,7 +16,7 @@ export default function Loading() {
       </section>
 
 
-      <section className="mx-auto max-w-7xl px-6 py-14 sm:px-10 lg:px-12">
+      <section id="discover" aria-busy="true" className="mx-auto max-w-7xl px-6 py-14 sm:px-10 lg:px-12">
         <div className="h-3 w-24 animate-pulse rounded-sm bg-game-border-faint" />
         <div className="mt-3 h-9 w-40 animate-pulse rounded-sm bg-game-surface-muted" />
 
@@ -32,7 +32,7 @@ export default function Loading() {
           ))}
         </div>
 
-        <div className="mt-10 grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-10 grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3" role="status" aria-label="Loading games">
           {Array.from({ length: 6 }).map((_, i) => (
             <div key={i}>
               <div className="aspect-[4/3] animate-pulse bg-game-surface-image" />
