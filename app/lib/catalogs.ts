@@ -22,8 +22,21 @@ async function fetchPlatforms(): Promise<RawgPlatform[]> {
   return fetchAllFromRawg<RawgPlatform>("/platforms");
 }
 
-async function fetchDevelopers(): Promise<RawgDeveloper[]> {
-  return fetchAllFromRawg<RawgDeveloper>("/developers");
+async function fetchDevelopers({
+  page = 1,
+  pageSize = 40,
+  search,
+}: {
+  page?: number;
+  pageSize?: number;
+  search?: string;
+} = {}): Promise<RawgListResponse<RawgDeveloper>> {
+  return fetchFromRawg<RawgListResponse<RawgDeveloper>>("/developers", {
+    ordering: "-games_count",
+    page,
+    page_size: pageSize,
+    search: search || undefined,
+  });
 }
 
 async function fetchDeveloperDetails(developerId: number): Promise<RawgDeveloperDetails> {
