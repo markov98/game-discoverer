@@ -7,6 +7,7 @@ The project is deployed here: [game-discoverer.vercel.app](game-discoverer.verce
 ## Features
 
 - Search games by title from the home page and advanced search page
+- Browse and search developers, ordered by game count
 - Filter results by genre, platform, and tags
 - Browse a featured game highlight, library cards, and pagination
 - Scroll through a developer's games, loaded a page at a time
@@ -72,6 +73,7 @@ npm run start  # Start the production server
 | `/` | Searchable and filterable game library |
 | `/search` | Advanced search form with multi-select genre and tag filters |
 | `/games/[id]` | Details for a specific game |
+| `/developers` | Searchable, paginated developer directory |
 | `/developers/[id]` | Developer details and an infinitely scrolling game list |
 | `/api/developers/[id]/games?page=<page>` | Server-side pagination endpoint for a developer's games |
 
@@ -85,13 +87,15 @@ The home page accepts these query parameters:
 
 Example: `/?search=elden%20ring&genre=role-playing-games-rpg&tag=singleplayer&page=1`
 
+The developer directory accepts `search` for a developer name and `page` for pagination. For example: `/developers?search=valve&page=2`.
+
 ## Project Structure
 
 ```text
 app/
 ├── components/       # Reusable browser and header components
 ├── api/              # Server-side API routes
-├── developers/[id]/  # Developer details and paginated games
+├── developers/       # Developer directory and developer details
 ├── games/[id]/       # Game detail route, screenshots, and related games
 ├── search/           # Advanced search UI with multi-select filters
 ├── lib/              # RAWG API clients, types, and formatters
@@ -101,20 +105,3 @@ app/
 ├── page.tsx          # Home page
 └── search/page.tsx   # Advanced search page
 ```
-
-## TODO
-
-Potential future improvements:
-
-- [ ] Add user accounts and authentication
-- [ ] Let users save favorite games
-- [ ] Add custom collections and wishlists
-- [ ] Add sorting by rating, release date, popularity, and title
-- [ ] Add filters for minimum rating and release year
-- [ ] Add richer game metadata such as playtime, developers, and publishers
-- [ ] Add related and similar game recommendations
-- [ ] Add a comparison view for multiple games
-- [ ] Add shareable filter and collection links
-- [ ] Add automated tests for API helpers and filter behavior
-- [ ] Add image optimization and caching for API media
-
