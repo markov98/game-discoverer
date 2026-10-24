@@ -14,7 +14,6 @@ The project is deployed here: [game-discoverer.vercel.app](game-discoverer.verce
 - View game ratings, release dates, genres, descriptions, and metadata
 - Explore screenshots and official store links on each game detail page
 - Discover more games from the same developer on the detail view
-- Loading states for the home page and game detail pages
 - Responsive layout for desktop and mobile screens
 
 ## Tech Stack
