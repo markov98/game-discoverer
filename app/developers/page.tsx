@@ -67,21 +67,24 @@ export default async function DevelopersPage({
           <p className="mt-3 max-w-2xl text-sm leading-6 text-game-text-dim">
             Find the studios behind the games you love and explore their libraries.
           </p>
-          <form action="/developers" className="mt-8 flex max-w-2xl flex-col gap-3 border-t border-game-border-strong pt-6 sm:flex-row" method="get">
-            <label className="sr-only" htmlFor="developer-search">Search developers</label>
+          <form
+            action="/developers"
+            className="mt-9 flex max-w-xl items-center gap-2 border-b border-game-text-quiet pb-3 focus-within:border-game-accent"
+            method="get"
+          >
             <input
-              className="h-12 min-w-0 flex-1 border border-game-border bg-game-surface px-4 text-sm text-game-text outline-none placeholder:text-game-text-faint focus:border-game-accent"
+              aria-label="Search developers"
+              className="min-w-0 flex-1 bg-transparent px-2 text-sm text-game-text outline-none placeholder:text-game-text-faint"
               defaultValue={search}
-              id="developer-search"
               name="search"
               placeholder="Search studios"
               type="search"
             />
             <button
-              className="border border-game-accent bg-game-accent px-5 py-3 text-xs font-bold uppercase tracking-[0.14em] text-game-ink transition hover:bg-game-accent-hover"
+              className="text-xs font-bold uppercase tracking-[0.18em] text-game-accent transition hover:text-game-accent-hover"
               type="submit"
             >
-              Search developers
+              Search
             </button>
           </form>
         </div>
