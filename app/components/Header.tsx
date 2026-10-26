@@ -21,6 +21,18 @@ export default function Header() {
           <Link className="text-sm text-game-accent transition hover:text-game-accent-hover" href="/search">
             Advanced search
           </Link>
+          <Link
+            className="border border-game-border px-4 py-2 text-sm text-game-text transition hover:border-game-accent hover:text-game-accent"
+            href="/login"
+          >
+            Log in
+          </Link>
+          <Link
+            className="border border-game-accent bg-game-accent px-4 py-2 text-sm font-semibold text-game-ink transition hover:bg-game-accent-hover"
+            href="/register"
+          >
+            Register
+          </Link>
         </nav>
 
       </div>
