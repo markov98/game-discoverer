@@ -14,6 +14,7 @@ The project is deployed here: [game-discoverer.vercel.app](game-discoverer.verce
 - View game ratings, release dates, genres, descriptions, and metadata
 - Explore screenshots and official store links on each game detail page
 - Discover more games from the same developer on the detail view
+- Create an account and log in with Firebase Authentication
 - Responsive layout for desktop and mobile screens
 
 ## Tech Stack
@@ -22,6 +23,7 @@ The project is deployed here: [game-discoverer.vercel.app](game-discoverer.verce
 - [React 19](https://react.dev/)
 - [TypeScript](https://www.typescriptlang.org/)
 - [Tailwind CSS 4](https://tailwindcss.com/)
+- [Firebase Authentication](https://firebase.google.com/docs/auth)
 - RAWG API for game data
 
 ## Getting Started
@@ -30,6 +32,7 @@ The project is deployed here: [game-discoverer.vercel.app](game-discoverer.verce
 
 - Node.js 20 or later
 - A RAWG API key. Create one from the [RAWG developer page](https://rawg.io/apidocs).
+- A Firebase project with Email/Password authentication enabled.
 
 ### Installation
 
@@ -44,6 +47,12 @@ The project is deployed here: [game-discoverer.vercel.app](game-discoverer.verce
 
 	```env
 	RAWG_API_KEY=your_rawg_api_key
+	NEXT_PUBLIC_FIREBASE_API_KEY=your_firebase_api_key
+	NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your_firebase_auth_domain
+	NEXT_PUBLIC_FIREBASE_PROJECT_ID=your_firebase_project_id
+	NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your_firebase_storage_bucket
+	NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your_firebase_messaging_sender_id
+	NEXT_PUBLIC_FIREBASE_APP_ID=your_firebase_app_id
 	```
 
 4. Start the development server:
@@ -54,7 +63,7 @@ The project is deployed here: [game-discoverer.vercel.app](game-discoverer.verce
 
 5. Open [http://localhost:3000](http://localhost:3000).
 
-The API key is read server-side and should not be committed to source control. Developer-game pagination requests additional pages through `/api/developers/[id]/games`; the RAWG key is only used by the server-side handler.
+The RAWG API key is read server-side and should not be committed to source control. Firebase's web app configuration is public client configuration; configure it in the deployment environment as well. Developer-game pagination requests additional pages through `/api/developers/[id]/games`; the RAWG key is only used by the server-side handler.
 
 ## Available Scripts
 
@@ -75,6 +84,8 @@ npm run start  # Start the production server
 | `/developers` | Searchable, paginated developer directory |
 | `/developers/[id]` | Developer details and an infinitely scrolling game list |
 | `/api/developers/[id]/games?page=<page>` | Server-side pagination endpoint for a developer's games |
+| `/login` | Log in with a Firebase Authentication account |
+| `/register` | Create a Firebase Authentication account |
 
 The home page accepts these query parameters:
 

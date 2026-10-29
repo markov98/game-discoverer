@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import AuthForm from "../components/AuthForm";
 
 export const metadata: Metadata = {
   title: "Register | GameDiscoverer",
@@ -14,41 +15,7 @@ export default function RegisterPage() {
           Register for a GameDiscoverer account.
         </p>
 
-        <div className="mt-9 grid max-w-xl gap-5 border-t border-game-border-strong pt-6">
-          <label className="grid gap-2 text-xs font-bold uppercase tracking-[0.12em] text-game-text-muted">
-            Name
-            <input
-              autoComplete="name"
-              className="h-11 w-full border border-game-border bg-game-surface px-3 text-sm font-normal normal-case tracking-normal text-game-text outline-none focus:border-game-accent"
-              name="name"
-              type="text"
-            />
-          </label>
-          <label className="grid gap-2 text-xs font-bold uppercase tracking-[0.12em] text-game-text-muted">
-            Email
-            <input
-              autoComplete="email"
-              className="h-11 w-full border border-game-border bg-game-surface px-3 text-sm font-normal normal-case tracking-normal text-game-text outline-none focus:border-game-accent"
-              name="email"
-              type="email"
-            />
-          </label>
-          <label className="grid gap-2 text-xs font-bold uppercase tracking-[0.12em] text-game-text-muted">
-            Password
-            <input
-              autoComplete="new-password"
-              className="h-11 w-full border border-game-border bg-game-surface px-3 text-sm font-normal normal-case tracking-normal text-game-text outline-none focus:border-game-accent"
-              name="password"
-              type="password"
-            />
-          </label>
-          <button
-            className="justify-self-start border border-game-accent bg-game-accent px-5 py-3 text-xs font-bold uppercase tracking-[0.14em] text-game-ink transition hover:bg-game-accent-hover"
-            type="button"
-          >
-            Register
-          </button>
-        </div>
+        <AuthForm mode="register" />
       </div>
     </section>
   );
