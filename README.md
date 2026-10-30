@@ -15,6 +15,7 @@ The project is deployed here: [game-discoverer.vercel.app](game-discoverer.verce
 - Explore screenshots and official store links on each game detail page
 - Discover more games from the same developer on the detail view
 - Create an account and log in with Firebase Authentication
+- Save and view game favorites in a private Firestore collection
 - Responsive layout for desktop and mobile screens
 
 ## Tech Stack
@@ -33,6 +34,7 @@ The project is deployed here: [game-discoverer.vercel.app](game-discoverer.verce
 - Node.js 20 or later
 - A RAWG API key. Create one from the [RAWG developer page](https://rawg.io/apidocs).
 - A Firebase project with Email/Password authentication enabled.
+- Firestore enabled with the included security rules deployed.
 
 ### Installation
 
@@ -65,6 +67,8 @@ The project is deployed here: [game-discoverer.vercel.app](game-discoverer.verce
 
 The RAWG API key is read server-side and should not be committed to source control. Firebase's web app configuration is public client configuration; configure it in the deployment environment as well. Developer-game pagination requests additional pages through `/api/developers/[id]/games`; the RAWG key is only used by the server-side handler.
 
+Deploy the Firestore security rules from the project root using the Firebase CLI (`firebase deploy --only firestore:rules`) after selecting your Firebase project. The rules restrict each user's favorites to that authenticated user.
+
 ## Available Scripts
 
 ```bash
@@ -86,6 +90,7 @@ npm run start  # Start the production server
 | `/api/developers/[id]/games?page=<page>` | Server-side pagination endpoint for a developer's games |
 | `/login` | Log in with a Firebase Authentication account |
 | `/register` | Create a Firebase Authentication account |
+| `/favorites` | View your saved games (requires sign-in) |
 
 The home page accepts these query parameters:
 

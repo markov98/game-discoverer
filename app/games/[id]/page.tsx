@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { fetchGameDetails, fetchGameScreenshots, fetchGameStores, fetchGamesByDeveloper } from "@/app/lib/games";
 import type { Game, GameDetails, GameScreenshot } from "@/app/lib/types";
+import FavoriteButton from "@/app/components/FavoriteButton";
 
 function formatReleaseDate(released?: string | null) {
   if (!released) return "Coming soon";
@@ -118,6 +119,14 @@ export default async function GameDetailsPage({
               <span>{formatReleaseDate(game.released)}</span>
               {game.metacritic && <span>{game.metacritic} Metacritic</span>}
             </div>
+            <FavoriteButton
+              game={{
+                id: game.id,
+                name: game.name,
+                slug: game.slug,
+                backgroundImage: game.background_image ?? "",
+              }}
+            />
             {(game.developers?.length || game.publishers?.length) ? (
               <dl className="mt-5 grid gap-x-8 gap-y-3 text-sm sm:grid-cols-2">
                 {game.developers && game.developers.length > 0 && (

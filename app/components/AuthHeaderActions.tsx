@@ -62,6 +62,9 @@ export default function AuthHeaderActions() {
           >
             {user.displayName || user.email}
           </span>
+          <Link className={linkClassName} href="/favorites">
+            Favorites
+          </Link>
           <button
             className={buttonClassName}
             disabled={isSigningOut}
