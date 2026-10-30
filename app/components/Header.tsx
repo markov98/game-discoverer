@@ -1,4 +1,5 @@
 import Link from "next/link";
+import AuthHeaderActions from "./AuthHeaderActions";
 
 export default function Header() {
   return (
@@ -21,6 +22,7 @@ export default function Header() {
           <Link className="text-sm text-game-accent transition hover:text-game-accent-hover" href="/search">
             Advanced search
           </Link>
+          <AuthHeaderActions />
         </nav>
 
       </div>
