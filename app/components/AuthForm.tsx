@@ -3,12 +3,13 @@
 import { FirebaseError } from "firebase/app";
 import {
   createUserWithEmailAndPassword,
+  onAuthStateChanged,
   signInWithEmailAndPassword,
   updateProfile,
 } from "firebase/auth";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState, type SubmitEvent } from "react";
+import { useEffect, useState, type SubmitEvent } from "react";
 import { auth } from "../lib/firebase";
 
 type AuthFormProps = {
@@ -44,6 +45,8 @@ function getAuthErrorMessage(error: unknown) {
 
 export default function AuthForm({ mode }: AuthFormProps) {
   const router = useRouter();
+  const [isAuthReady, setIsAuthReady] = useState(false);
+  const [authCheckError, setAuthCheckError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [name, setName] = useState("");
@@ -51,6 +54,31 @@ export default function AuthForm({ mode }: AuthFormProps) {
   const [password, setPassword] = useState("");
   const [passwordConfirmation, setPasswordConfirmation] = useState("");
   const isRegistering = mode === "register";
+
+  useEffect(() => {
+    let isInitialAuthCheck = true;
+
+    const unsubscribe = onAuthStateChanged(
+      auth,
+      (currentUser) => {
+        if (!isInitialAuthCheck) return;
+        isInitialAuthCheck = false;
+
+        if (currentUser) {
+          router.replace("/");
+          return;
+        }
+
+        setIsAuthReady(true);
+      },
+      () => {
+        setAuthCheckError("Unable to check your sign-in status. Please refresh the page.");
+        setIsAuthReady(true);
+      },
+    );
+
+    return unsubscribe;
+  }, [router]);
 
   async function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -95,6 +123,22 @@ export default function AuthForm({ mode }: AuthFormProps) {
     } finally {
       setIsSubmitting(false);
     }
+  }
+
+  if (!isAuthReady) {
+    return (
+      <p className="mt-9 text-sm text-game-text-dim" role="status">
+        Checking sign-in status...
+      </p>
+    );
+  }
+
+  if (authCheckError) {
+    return (
+      <p className="mt-9 text-sm text-red-300" role="alert">
+        {authCheckError}
+      </p>
+    );
   }
 
   return (
