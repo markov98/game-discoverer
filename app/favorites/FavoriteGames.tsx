@@ -2,7 +2,13 @@
 
 import { onAuthStateChanged, type User } from "firebase/auth";
 import { FirebaseError } from "firebase/app";
-import { collection, onSnapshot } from "firebase/firestore";
+import {
+  collection,
+  onSnapshot,
+  type DocumentData,
+  type FirestoreError,
+  type QuerySnapshot,
+} from "firebase/firestore";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { auth, db } from "../lib/firebase";
@@ -49,49 +55,52 @@ export default function FavoriteGames() {
 
   useEffect(() => {
     let unsubscribeFavorites: (() => void) | undefined;
-    const unsubscribeAuth = onAuthStateChanged(
-      auth,
-      (currentUser) => {
-        setUser(currentUser);
-        setIsAuthReady(true);
-        unsubscribeFavorites?.();
+    const handleFavoritesSnapshot = (snapshot: QuerySnapshot<DocumentData>) => {
+      try {
+        const favoriteGames = snapshot.docs
+          .map((favorite) => getFavoriteGame(favorite.data(), favorite.id))
+          .sort((left, right) => left.name.localeCompare(right.name));
+        setGames(favoriteGames);
         setErrorMessage("");
-
-        if (!currentUser) {
-          setGames([]);
-          setIsLoading(false);
-          return;
-        }
-
-        setIsLoading(true);
-        setErrorMessage("");
-        unsubscribeFavorites = onSnapshot(
-          collection(db, "users", currentUser.uid, "favorites"),
-          (snapshot) => {
-            try {
-              const favoriteGames = snapshot.docs
-                .map((favorite) => getFavoriteGame(favorite.data(), favorite.id))
-                .sort((left, right) => left.name.localeCompare(right.name));
-              setGames(favoriteGames);
-              setErrorMessage("");
-            } catch {
-              setErrorMessage("A favorite has invalid data and could not be displayed.");
-            } finally {
-              setIsLoading(false);
-            }
-          },
-          (error) => {
-            setErrorMessage(getErrorMessage(error));
-            setIsLoading(false);
-          },
-        );
-      },
-      () => {
-        setErrorMessage("Unable to check your sign-in status. Please refresh the page.");
-        setIsAuthReady(true);
+      } catch {
+        setErrorMessage("A favorite has invalid data and could not be displayed.");
+      } finally {
         setIsLoading(false);
-      },
-    );
+      }
+    };
+
+    const handleFavoritesError = (error: FirestoreError) => {
+      setErrorMessage(getErrorMessage(error));
+      setIsLoading(false);
+    };
+
+    const handleAuthStateChange = (currentUser: User | null) => {
+      setUser(currentUser);
+      setIsAuthReady(true);
+      unsubscribeFavorites?.();
+      setErrorMessage("");
+
+      if (!currentUser) {
+        setGames([]);
+        setIsLoading(false);
+        return;
+      }
+
+      setIsLoading(true);
+      unsubscribeFavorites = onSnapshot(
+        collection(db, "users", currentUser.uid, "favorites"),
+        handleFavoritesSnapshot,
+        handleFavoritesError,
+      );
+    };
+
+    const handleAuthError = () => {
+      setErrorMessage("Unable to check your sign-in status. Please refresh the page.");
+      setIsAuthReady(true);
+      setIsLoading(false);
+    };
+
+    const unsubscribeAuth = onAuthStateChanged(auth, handleAuthStateChange, handleAuthError);
 
     return () => {
       unsubscribeAuth();
