@@ -19,7 +19,7 @@ export default function Header() {
           <Link className="text-sm text-game-text-dim transition hover:text-game-accent" href="/developers">
             Developers
           </Link>
-          <Link className="text-sm text-game-accent transition hover:text-game-accent-hover" href="/search">
+          <Link className="text-sm text-game-text-dim transition hover:text-game-accent" href="/search">
             Advanced search
           </Link>
           <AuthHeaderActions />

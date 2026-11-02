@@ -56,15 +56,15 @@ export default function AuthHeaderActions() {
       )}
       {user ? (
         <>
+          <Link className="text-sm text-game-text-dim transition hover:text-game-accent" href="/favorites">
+            Favorites
+          </Link>
           <span
-            className="max-w-40 truncate text-sm text-game-text"
+            className="max-w-40 truncate text-sm text-game-accent"
             title={user.displayName || user.email || undefined}
           >
             {user.displayName || user.email}
           </span>
-          <Link className={linkClassName} href="/favorites">
-            Favorites
-          </Link>
           <button
             className={buttonClassName}
             disabled={isSigningOut}
