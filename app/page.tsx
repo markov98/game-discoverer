@@ -3,8 +3,11 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { fetchGames } from "./lib/games";
 import { formatReleaseDate } from "./lib/formatters";
+import { isRawgUnavailable } from "./lib/rawg-client";
 
 const pageSize = 12;
+const catalogUnavailableMessage = "The game catalog is temporarily unavailable because RAWG can't be reached. Please try again later.";
+const catalogErrorMessage = "We couldn't load the game catalog because something went wrong. Please try again.";
 
 export const metadata: Metadata = {
   title: "Discover games | GameDiscoverer",
@@ -14,8 +17,12 @@ async function getDiscoverGames(query: string, genre: string, platform: string, 
   try {
     const data = await fetchGames({ query, page, pageSize, genre, platform, tag });
     return { games: data.results, total: data.count, error: null };
-  } catch {
-    return { games: [], total: 0, error: "API Problem, please try again later." };
+  } catch (error) {
+    return {
+      games: [],
+      total: 0,
+      error: isRawgUnavailable(error) ? catalogUnavailableMessage : catalogErrorMessage,
+    };
   }
 }
 

@@ -3,8 +3,12 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { fetchDeveloperDetails } from "@/app/lib/catalogs";
 import { fetchDeveloperGames } from "@/app/lib/games";
+import { isRawgNotFound, isRawgUnavailable } from "@/app/lib/rawg-client";
 import type { Game, RawgDeveloperDetails } from "@/app/lib/types";
 import DeveloperGames from "./DeveloperGames";
+
+const developerUnavailableMessage = "We couldn't load this developer's details because RAWG is temporarily unavailable. Please try again later.";
+const developerErrorMessage = "We couldn't load this developer's details because something went wrong. Please try again.";
 
 function stripHtmlAndNormalize(description?: string) {
   return description?.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
@@ -15,26 +19,37 @@ async function getDeveloper(id: number): Promise<{
   games: Game[];
   totalGames: number;
   hasMore: boolean;
+  notFound?: boolean;
   error?: string;
 }> {
+  let developer: RawgDeveloperDetails;
   try {
-    const [developer, games] = await Promise.all([
-      fetchDeveloperDetails(id),
-      fetchDeveloperGames(id),
-    ]);
+    developer = await fetchDeveloperDetails(id);
+  } catch (error) {
+    return {
+      games: [],
+      totalGames: 0,
+      hasMore: false,
+      notFound: isRawgNotFound(error),
+      error: isRawgUnavailable(error) ? developerUnavailableMessage : developerErrorMessage,
+    };
+  }
 
+  try {
+    const games = await fetchDeveloperGames(id);
     return {
       developer,
       games: games.results,
       totalGames: games.count,
       hasMore: Boolean(games.next),
     };
-  } catch {
+  } catch (error) {
     return {
+      developer,
       games: [],
       totalGames: 0,
       hasMore: false,
-      error: "API Problem, please try again later.",
+      error: isRawgUnavailable(error) ? developerUnavailableMessage : developerErrorMessage,
     };
   }
 }
@@ -66,7 +81,8 @@ export default async function DeveloperDetailsPage({
   const id = Number.parseInt((await params).id, 10);
   if (!Number.isInteger(id) || id <= 0) notFound();
 
-  const { developer, games, totalGames, hasMore, error } = await getDeveloper(id);
+  const { developer, games, totalGames, hasMore, notFound: developerNotFound, error } = await getDeveloper(id);
+  if (developerNotFound) notFound();
 
   if (!developer) {
     return (
@@ -75,7 +91,7 @@ export default async function DeveloperDetailsPage({
           Back to discover
         </Link>
         <div className="mt-10 border border-dashed border-game-border-dashed bg-game-surface px-6 py-16 text-center">
-          <p className="font-serif text-3xl text-game-text">{error ?? "API Problem, please try again later."}</p>
+          <p className="font-serif text-3xl text-game-text">{error ?? developerErrorMessage}</p>
         </div>
       </div>
     );

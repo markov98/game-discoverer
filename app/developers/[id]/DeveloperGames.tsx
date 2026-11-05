@@ -5,7 +5,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { formatReleaseDate } from "@/app/lib/formatters";
 import type { Game } from "@/app/lib/types";
 
-const loadErrorMessage = "Could not load more games. Please try again.";
+const loadErrorMessage = "We couldn't load more games by this developer. Please try again.";
 
 export default function DeveloperGames({
   developerId,
@@ -33,7 +33,11 @@ export default function DeveloperGames({
 
     try {
       const response = await fetch(`/api/developers/${developerId}/games?page=${page}`);
-      if (!response.ok) throw new Error(loadErrorMessage);
+      if (!response.ok) {
+        const data = await response.json().catch(() => null) as { error?: string } | null;
+        setError(data?.error ?? loadErrorMessage);
+        return;
+      }
 
       const data: { games: Game[]; hasMore: boolean } = await response.json();
       setGames((currentGames) => [...currentGames, ...data.games]);

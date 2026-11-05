@@ -2,6 +2,27 @@ import type { RawgListResponse } from "./types";
 
 const RAWG_API_KEY = process.env.RAWG_API_KEY;
 const RAWG_API_URL = "https://api.rawg.io/api";
+const RAWG_CACHE_REVALIDATE_SECONDS = 86_400;
+const RAWG_REQUEST_TIMEOUT_MS = 8_000;
+
+export class RawgApiError extends Error {
+  constructor(
+    message: string,
+    readonly kind: "unavailable" | "request" | "not-found",
+    readonly status?: number,
+  ) {
+    super(message);
+    this.name = "RawgApiError";
+  }
+}
+
+export function isRawgUnavailable(error: unknown): boolean {
+  return error instanceof RawgApiError && error.kind === "unavailable";
+}
+
+export function isRawgNotFound(error: unknown): boolean {
+  return error instanceof RawgApiError && error.kind === "not-found";
+}
 
 export async function fetchFromRawg<T>(
   path: string,
@@ -9,7 +30,7 @@ export async function fetchFromRawg<T>(
   options: { next?: { revalidate?: number } } = {},
 ): Promise<T> {
   if (!RAWG_API_KEY) {
-    throw new Error("RAWG_API_KEY is not defined");
+    throw new RawgApiError("RAWG_API_KEY is not defined", "request");
   }
 
   const url = new URL(`${RAWG_API_URL}${path}`);
@@ -21,10 +42,26 @@ export async function fetchFromRawg<T>(
     }
   });
 
-  const response = await fetch(url.toString(), options);
+  let response: Response;
+  try {
+    response = await fetch(url.toString(), {
+      ...options,
+      next: {
+        revalidate: options.next?.revalidate ?? RAWG_CACHE_REVALIDATE_SECONDS,
+      },
+      signal: AbortSignal.timeout(RAWG_REQUEST_TIMEOUT_MS),
+    });
+  } catch {
+    throw new RawgApiError("RAWG could not be reached", "unavailable");
+  }
 
   if (!response.ok) {
-    throw new Error(`Error fetching ${path}: ${response.statusText}`);
+    const kind = response.status === 404
+      ? "not-found"
+      : response.status === 408 || response.status === 429 || response.status >= 500
+        ? "unavailable"
+        : "request";
+    throw new RawgApiError(`Error fetching ${path}: ${response.statusText}`, kind, response.status);
   }
 
   return response.json() as Promise<T>;

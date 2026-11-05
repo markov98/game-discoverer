@@ -1,8 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { fetchDevelopers } from "@/app/lib/catalogs";
+import { isRawgUnavailable } from "@/app/lib/rawg-client";
 
 const pageSize = 24;
+const developersUnavailableMessage = "The developer directory is temporarily unavailable because RAWG can't be reached. Please try again later.";
+const developersErrorMessage = "We couldn't load the developer directory because something went wrong. Please try again.";
 
 export const metadata: Metadata = {
   title: "Explore developers | GameDiscoverer",
@@ -36,12 +39,12 @@ async function getDevelopers(search: string, page: number) {
     const correctedPage = Math.min(page, lastPage);
     const results = correctedPage === page ? data : await fetchPage(correctedPage);
     return { developers: results.results, total: data.count, page: correctedPage, error: null };
-  } catch {
+  } catch (error) {
     return {
       developers: [],
       total: 0,
       page,
-      error: "Could not load developers. Please try again later.",
+      error: isRawgUnavailable(error) ? developersUnavailableMessage : developersErrorMessage,
     };
   }
 }

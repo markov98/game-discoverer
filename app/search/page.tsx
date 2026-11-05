@@ -1,10 +1,14 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { fetchSearchFilterOptions } from "../lib/catalogs";
+import { isRawgUnavailable } from "../lib/rawg-client";
 
 export const metadata: Metadata = {
   title: "Advanced game search | GameDiscoverer",
 };
+
+const catalogUnavailableMessage = "We couldn't load the search filters because RAWG is temporarily unavailable. Please try again later.";
+const catalogErrorMessage = "We couldn't load the search filters because something went wrong. Please try again.";
 
 type SearchParams = {
   search?: string | string[];
@@ -32,7 +36,12 @@ export default async function AdvancedSearch({
   const genres = normalizeValues(params.genre);
   const platform = firstValue(params.platform);
   const tags = normalizeValues(params.tag);
-  const filterOptions = await fetchSearchFilterOptions().catch(() => ({ genres: [], platforms: [], tags: [] }));
+  const { filterOptions, filterOptionsError } = await fetchSearchFilterOptions()
+    .then((filterOptions) => ({ filterOptions, filterOptionsError: null }))
+    .catch((error: unknown) => ({
+      filterOptions: { genres: [], platforms: [], tags: [] },
+      filterOptionsError: isRawgUnavailable(error) ? catalogUnavailableMessage : catalogErrorMessage,
+    }));
 
   return (
     <>
@@ -41,6 +50,11 @@ export default async function AdvancedSearch({
           <p className="text-xs font-bold uppercase tracking-[0.25em] text-game-accent">The library</p>
           <h1 className="mt-3 font-serif text-4xl text-game-text sm:text-5xl">Advanced search</h1>
           <p className="mt-3 max-w-2xl text-sm leading-6 text-game-text-dim">Find games by title, platform, genre, and tags.</p>
+          {filterOptionsError && (
+            <p className="mt-4 max-w-2xl text-sm text-game-text-muted" role="alert">
+              {filterOptionsError}
+            </p>
+          )}
 
           <form action="/" className="mt-8 grid gap-5 border-t border-game-border-strong pt-6 sm:grid-cols-2 lg:grid-cols-4" method="get">
             <label className="grid content-start gap-2 text-xs font-bold uppercase tracking-[0.12em] text-game-text-muted">

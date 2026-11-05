@@ -2,8 +2,12 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { fetchGameDetails, fetchGameScreenshots, fetchGameStores, fetchGamesByDeveloper } from "@/app/lib/games";
+import { isRawgNotFound, isRawgUnavailable } from "@/app/lib/rawg-client";
 import type { Game, GameDetails, GameScreenshot } from "@/app/lib/types";
 import FavoriteButton from "@/app/components/FavoriteButton";
+
+const gameUnavailableMessage = "We couldn't load this game's details because RAWG is temporarily unavailable. Please try again later.";
+const gameErrorMessage = "We couldn't load this game's details because something went wrong. Please try again.";
 
 function formatReleaseDate(released?: string | null) {
   if (!released) return "Coming soon";
@@ -19,10 +23,22 @@ function stripHtmlAndNormalize(description?: string) {
   return description?.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
 }
 
-async function getGame(id: number): Promise<{ game?: GameDetails; screenshots: GameScreenshot[]; developerGames: Game[]; storeLinks: Array<{ id: number; url: string; label: string }>; error?: string }> {
+async function getGame(id: number): Promise<{ game?: GameDetails; screenshots: GameScreenshot[]; developerGames: Game[]; storeLinks: Array<{ id: number; url: string; label: string }>; notFound?: boolean; error?: string }> {
+  let game: GameDetails;
   try {
-    const [game, screenshots, stores] = await Promise.all([
-      fetchGameDetails(id),
+    game = await fetchGameDetails(id);
+  } catch (error) {
+    return {
+      screenshots: [],
+      developerGames: [],
+      storeLinks: [],
+      notFound: isRawgNotFound(error),
+      error: isRawgUnavailable(error) ? gameUnavailableMessage : gameErrorMessage,
+    };
+  }
+
+  try {
+    const [screenshots, stores] = await Promise.all([
       fetchGameScreenshots(id),
       fetchGameStores(id),
     ]);
@@ -43,13 +59,13 @@ async function getGame(id: number): Promise<{ game?: GameDetails; screenshots: G
           label: store.store?.name ?? store.store?.slug ?? "Store",
         })),
     };
-  } catch {
+  } catch (error) {
     return {
       game: undefined,
       screenshots: [],
       developerGames: [],
       storeLinks: [],
-      error: "API Problem, please try again later.",
+      error: isRawgUnavailable(error) ? gameUnavailableMessage : gameErrorMessage,
     };
   }
 }
@@ -81,7 +97,8 @@ export default async function GameDetailsPage({
   const id = Number.parseInt((await params).id, 10);
   if (!Number.isInteger(id)) notFound();
 
-  const { game, screenshots, developerGames, storeLinks, error } = await getGame(id);
+  const { game, screenshots, developerGames, storeLinks, notFound: gameNotFound, error } = await getGame(id);
+  if (gameNotFound) notFound();
 
   if (!game) {
     return (
@@ -91,7 +108,7 @@ export default async function GameDetailsPage({
             Back to discover
           </Link>
           <div className="mt-10 border border-dashed border-game-border-dashed bg-game-surface px-6 py-16 text-center">
-            <p className="font-serif text-3xl text-game-text">{error ?? "API Problem, please try again later."}</p>
+            <p className="font-serif text-3xl text-game-text">{error ?? gameErrorMessage}</p>
           </div>
         </div>
       </div>
